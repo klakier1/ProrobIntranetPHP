@@ -32,7 +32,7 @@
             }
         }
 
-        public function createUser($email, $hashed_pass, $role, $active, $first_name, $last_name, $title, $phone, $days_availabe, $notify){
+        public function createUser($email, $pass, $role, $active, $first_name, $last_name, $title, $phone, $days_availabe, $notify){
             if($this->con == null)
                 return DB_ERROR;
             

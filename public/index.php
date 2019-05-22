@@ -85,7 +85,7 @@ $app->group('/api', function(\Slim\App $app) {
             /* Admin authorized */
             if(!haveEmptyParameters(array(
                 'email', 
-                'hashed_pass', 
+                'pass', 
                 'role', 
                 'active', 
                 'first_name', 
@@ -95,12 +95,12 @@ $app->group('/api', function(\Slim\App $app) {
                 'days_availabe', 
                 'notify'
                 ), $request, $response)){
-                    
+
                 $request_data = $request->getParsedBody(); 
                 $db = new DbOperation; 
                 $result = $db->createUser(
                     $request_data['email'], 
-                    $request_data['hashed_pass'], 
+                    $request_data['pass'], 
                     $request_data['role'], 
                     $request_data['active'], 
                     $request_data['first_name'], 
