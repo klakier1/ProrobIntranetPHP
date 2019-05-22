@@ -120,7 +120,7 @@
             if($this->con == null)
                 return DB_ERROR;
             
-            $query = $this->con->prepare('SELECT * FROM public.employees', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+            $query = $this->con->prepare('SELECT * FROM public.users', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
             if($query->execute()){
                 $result = $query->fetchAll(PDO::FETCH_ASSOC);
                 return GET_USERS_SUCCESS;
