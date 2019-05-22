@@ -83,14 +83,32 @@ $app->group('/api', function(\Slim\App $app) {
         $token = $request->getAttribute("decoded_token_data");
         if ($token['admin'] == true) {
             /* Admin authorized */
-            if(!haveEmptyParameters(array('email' ,'password', 'name', 'surname'), $request, $response)){
+            if(!haveEmptyParameters(array(
+                'email', 
+                'hashed_pass', 
+                'role', 
+                'active', 
+                'first_name', 
+                'last_name', 
+                'title', 
+                'phone', 
+                'days_availabe', 
+                'notify'
+                ), $request, $response)){
+                    
                 $request_data = $request->getParsedBody(); 
                 $db = new DbOperation; 
                 $result = $db->createUser(
                     $request_data['email'], 
-                    $request_data['password'], 
-                    $request_data['name'], 
-                    $request_data['surname']);
+                    $request_data['hashed_pass'], 
+                    $request_data['role'], 
+                    $request_data['active'], 
+                    $request_data['first_name'], 
+                    $request_data['last_name'], 
+                    $request_data['title'], 
+                    $request_data['phone'], 
+                    $request_data['days_availabe'], 
+                    $request_data['notify']);
                 
                 if($result == USER_CREATED){
                     return $response = standardResponse($response, 201, false, 'User created successfully'); 

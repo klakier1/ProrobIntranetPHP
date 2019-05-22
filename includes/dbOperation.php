@@ -32,7 +32,7 @@
             }
         }
 
-        public function createUser($email, $hashed_pass){
+        public function createUser($email, $hashed_pass, $role, $active, $first_name, $last_name, $title, $phone, $days_availabe, $notify){
             if($this->con == null)
                 return DB_ERROR;
             
@@ -84,7 +84,7 @@
                 $query->bindValue(':role', $role, PDO::PARAM_STR);
                 $query->bindValue(':active', $active, PDO::PARAM_BOOL);
                 $query->bindValue(':first_name', $first_name, PDO::PARAM_STR);
-                $query->bindValue(':last_name', $ast_name, PDO::PARAM_STR);
+                $query->bindValue(':last_name', $last_name, PDO::PARAM_STR);
                 $query->bindValue(':title', $title, PDO::PARAM_STR);
                 $query->bindValue(':phone', $phone, PDO::PARAM_STR);
                 $query->bindValue(':days_availabe', $days_availabe, PDO::PARAM_INT);

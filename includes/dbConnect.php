@@ -35,7 +35,7 @@
 
         function getDbCredentials(){
 
-            $database_url = getenv("DATABASE_URL");
+            $database_url = getenv("DATABASE_URL_PROROB");
             return parse_url($database_url);
         }
     }
