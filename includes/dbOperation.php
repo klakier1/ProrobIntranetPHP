@@ -14,7 +14,7 @@
             if($this->con == null)
                 return DB_ERROR;
 
-            $query = $this->con->prepare("SELECT user_id, password, admin FROM public.employees WHERE email= :email;");
+            $query = $this->con->prepare("SELECT id, password, admin FROM public.users WHERE email= :email;");
             $query->bindValue(':email', $email, PDO::PARAM_STR);
             $query->execute();
             $result = $query->fetch();
@@ -101,7 +101,7 @@
         }
 
         private function isEmailExist($email){
-            $query = $this->con->prepare('SELECT user_id FROM public.employees WHERE email = :email');
+            $query = $this->con->prepare('SELECT id FROM public.users WHERE email = :email');
             $query->bindValue(':email', $email, PDO::PARAM_STR);
             $query->execute();
             $result = $query->fetchAll();
@@ -109,7 +109,7 @@
         }
 
         private function isIdExist($id){
-            $query = $this->con->prepare('SELECT user_id FROM public.employees WHERE user_id = :id');
+            $query = $this->con->prepare('SELECT id FROM public.users WHERE id = :id');
             $query->bindValue(':id', $id, PDO::PARAM_STR);
             $query->execute();
             $result = $query->fetchAll();
@@ -134,7 +134,7 @@
                 return DB_ERROR;
 
             if($this->isEmailExist($email)){
-                $query = $this->con->prepare('DELETE FROM public.employees WHERE email = :email');
+                $query = $this->con->prepare('DELETE FROM public.users WHERE email = :email');
                 $query->bindValue(':email', $email, PDO::PARAM_STR);
                 if($query->execute()){
                     return DELETE_USER_SUCCESS;
@@ -151,7 +151,7 @@
                 return DB_ERROR;
             
             if($this->isIdExist($id)){
-                $query = $this->con->prepare('DELETE FROM public.employees WHERE user_id = :id');
+                $query = $this->con->prepare('DELETE FROM public.users WHERE id = :id');
                 $query->bindValue(':id', $id, PDO::PARAM_STR);
                 if($query->execute()){
                     return DELETE_USER_SUCCESS;
