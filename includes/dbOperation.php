@@ -32,17 +32,64 @@
             }
         }
 
-        public function createUser($email, $pass, $name, $surname){
+        public function createUser($email, $hashed_pass){
             if($this->con == null)
                 return DB_ERROR;
             
             if(!$this->isEmailExist($email)){
                 $hash_password = password_hash($pass, PASSWORD_DEFAULT);
-                $query = $this->con->prepare("INSERT INTO public.employees(name, surname, password, email, created_on, last_login) VALUES (:user, :surname, :pass, :email, NOW(), null);");
-                $query->bindValue(':pass', $hash_password, PDO::PARAM_STR);
-                $query->bindValue(':surname', $surname, PDO::PARAM_STR);
-                $query->bindValue(':user', $name, PDO::PARAM_STR);
+                $query = $this->con->prepare(
+                    "INSERT INTO public.users(
+                        created_at, 
+                        updated_at, 
+                        email, 
+                        encrypted_password, 
+                        confirmation_token, 
+                        remember_token, 
+                        avatar_file_name, 
+                        avatar_content_type, 
+                        avatar_file_size, 
+                        avatar_updated_at, 
+                        role, 
+                        active, 
+                        first_name, 
+                        last_name, 
+                        title, 
+                        phone, 
+                        days_available, 
+                        notify)
+                    VALUES (
+                        NOW(),
+                        NOW(), 
+                        :email,
+                        :pass, 
+                        NULL, 
+                        NULL,
+                        NULL, 
+                        NULL, 
+                        NULL,
+                        NULL,
+                        :role,
+                        :active,
+                        :first_name,
+                        :last_name, 
+                        :title, 
+                        :phone, 
+                        :days_availabe, 
+                        :notify);"
+                );
+
                 $query->bindValue(':email', $email, PDO::PARAM_STR);
+                $query->bindValue(':pass', $hashed_pass, PDO::PARAM_STR);
+                $query->bindValue(':role', $role, PDO::PARAM_STR);
+                $query->bindValue(':active', $active, PDO::PARAM_BOOL);
+                $query->bindValue(':first_name', $first_name, PDO::PARAM_STR);
+                $query->bindValue(':last_name', $ast_name, PDO::PARAM_STR);
+                $query->bindValue(':title', $title, PDO::PARAM_STR);
+                $query->bindValue(':phone', $phone, PDO::PARAM_STR);
+                $query->bindValue(':days_availabe', $days_availabe, PDO::PARAM_INT);
+                $query->bindValue(':notify', $notify, PDO::PARAM_BOOL);
+
                 if($query->execute()){
                     return USER_CREATED;
                 }else{
