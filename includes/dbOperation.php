@@ -64,7 +64,7 @@
                         :email,
                         :pass, 
                         NULL, 
-                        NULL,
+                        'test',
                         NULL, 
                         NULL, 
                         NULL,
