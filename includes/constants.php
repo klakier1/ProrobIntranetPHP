@@ -1,9 +1,4 @@
 <?php 
-//    define('DB_HOST', 'ec2-54-195-252-243.eu-west-1.compute.amazonaws.com');
-//    define('DB_USER', 'esqaxbtuslanyh');
-//    define('DB_PASSWORD', '8baab7795ad0279db771b013a6d5a38f3b046184655e05792654ff4095cddd91');
-//    define('DB_NAME', 'd8ep196q5715v6');
-    
     define('DB_ERROR', 001);
     define('USER_CREATED', 101);
     define('USER_EXISTS', 102);
