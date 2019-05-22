@@ -11,6 +11,7 @@
             try
             {
                 $credentials = $this->getDbCredentials();
+                var_dump($credentials);
                 extract($credentials);
                 $path = ltrim($path, "/");
                 
