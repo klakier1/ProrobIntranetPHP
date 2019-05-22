@@ -37,7 +37,7 @@
                 return DB_ERROR;
             
             if(!$this->isEmailExist($email)){
-                $hash_password = password_hash($pass, PASSWORD_DEFAULT);
+                $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
                 $query = $this->con->prepare(
                     "INSERT INTO public.users(
                         created_at, 
