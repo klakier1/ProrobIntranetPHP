@@ -49,20 +49,22 @@ $app->post('/login', function (Request $request, Response $response, array $args
     if(!haveEmptyParameters(array('email' ,'password'), $request, $response)){ 
         $request_data = $request->getParsedBody(); 
         $db = new DbOperation; 
-        $user_id = -1;
-        $is_admin = false;
+        $id = -1;
+        $role = "";
         $result = $db->login(
             $request_data['email'], 
             $request_data['password'], 
             $user_id, 
-            $is_admin);
+            $role);
     
         if($result == USER_NOT_FOUND){
-            return $response = standardResponse($response, 422, true, 'User not found');   
+            return $response = standardResponse($response, 422, true, 'User not found');
+        }else if($result == USER_NOT_ACTIVE){
+            return $response = standardResponse($response, 422, true, 'User not active'); 
         }else if($result == USER_PASSWORD_DO_NOT_MATCH){
             return $response = standardResponse($response, 401, true, 'Wrong password');  
         }else if($result == USER_AUTHENTICATED){
-            $token = JWT::encode(['id' => $user_id, 'email' => $email, 'admin' => $is_admin], getenv("JWT_SECRET"), "HS256");
+            $token = JWT::encode(['id' => $id, 'role' => $role, 'version' => TOKEN_VERSION], getenv("JWT_SECRET"), "HS256");
             return $response = standardResponse($response, 200, false, 'Token generated', ['token' => $token]);
         }else if($result == DB_ERROR){
             return $response = standardResponse($response, 500, true, 'Database error');
@@ -81,7 +83,7 @@ $app->group('/api', function(\Slim\App $app) {
     */
     $app->post('/user', function(Request $request, Response $response){
         $token = $request->getAttribute("decoded_token_data");
-        if ($token['admin'] == true) {
+        if ($token['role'] == admin) {
             /* Admin authorized */
             if(!haveEmptyParameters(array(
                 'email', 
@@ -135,7 +137,7 @@ $app->group('/api', function(\Slim\App $app) {
     */
     $app->get('/user[/{params:.*}]', function(Request $request, Response $response, $args){
         $token = $request->getAttribute("decoded_token_data");
-        if ($token['admin'] == true) {
+        if ($token['role'] == admin) {
             /* Admin authorized  */
             $params = array_filter(explode('/', $args['params']));
             
@@ -167,7 +169,7 @@ $app->group('/api', function(\Slim\App $app) {
     */
     $app->delete('/user[/{params:.*}]', function(Request $request, Response $response, $args){
         $token = $request->getAttribute("decoded_token_data");
-        if ($token['admin'] == true) {
+        if ($token['role'] == admin) {
             /* Admin authorized  */
             $params = array_filter(explode('/', $args['params']));
 

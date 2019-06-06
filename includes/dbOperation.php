@@ -10,21 +10,23 @@
             $this->con = $db->connect();
         }
         
-        public function login($email, $pass, &$user_id, &$is_admin){
+        public function login($email, $pass, &$id, &$role){
             if($this->con == null)
                 return DB_ERROR;
 
-            $query = $this->con->prepare("SELECT id, password, admin FROM public.users WHERE email= :email;");
+            $query = $this->con->prepare("SELECT id, encrypted_password, role, active FROM public.users WHERE email= :email;");
             $query->bindValue(':email', $email, PDO::PARAM_STR);
             $query->execute();
             $result = $query->fetch();
 
             if($result == null || count($result) == 0){
                 return USER_NOT_FOUND;
+            }elseif(filter_var($result['active'], FILTER_VALIDATE_BOOLEAN) == false){
+                return USER_NOT_ACTIVE;
             }else{
-                if(password_verify($pass, $result['password'])){
-                    $user_id = $result['user_id'];
-                    $is_admin = $result['admin'];
+                if(password_verify($pass, $result['encrypted_password'])){
+                    $id = $result['id'];
+                    $role = $result['role'];
                     return USER_AUTHENTICATED;
                 }else{
                     return USER_PASSWORD_DO_NOT_MATCH;
@@ -114,6 +116,22 @@
             $query->execute();
             $result = $query->fetchAll();
             return count($result);
+        }
+
+        private function isUserActive($id){
+            $query = $this->con->prepare('SELECT active FROM public.users WHERE id = :id');
+            $query->bindValue(':id', $id, PDO::PARAM_STR);
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+            return filter_var($result['active'], FILTER_VALIDATE_BOOLEAN);
+        }
+
+        private function getUserRole($id){
+            $query = $this->con->prepare('SELECT role FROM public.users WHERE id = :id');
+            $query->bindValue(':id', $id, PDO::PARAM_STR);
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+            return $result['role'];
         }
 
         public function getAllUsers(&$result){
