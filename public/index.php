@@ -163,6 +163,9 @@ $app->group('/api', function(\Slim\App $app) {
             }
         }elseif (checkTokenData($token) == TOKEN_EMPLOYEE) {
             // /user/id/[0-9]
+
+            $response->getBody()->write("OK");
+
             if(count($params) == 2 && $params[0] == 'id' && is_int($params[1])){
                 $request_id = $params[1];
                 if($token['id'] == $request_id )
