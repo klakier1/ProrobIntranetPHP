@@ -1,5 +1,7 @@
 <?php
 
+use \Firebase\JWT\JWT;
+
     function checkTokenData($token)
     {
         if($token['version'] == getenv("TOKEN_VERSION")){
