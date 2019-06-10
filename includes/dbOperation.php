@@ -158,7 +158,7 @@
             $query->bindValue(':id', $id, PDO::PARAM_STR);
 
             if($query->execute()){
-                if($result->rowCount() == 1){
+                if($query->rowCount() == 1){
                     $result = $query->fetchAll(PDO::FETCH_ASSOC);
                     return GET_USERS_SUCCESS;
                 }else{
