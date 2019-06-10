@@ -167,11 +167,11 @@ $app->group('/api', function(\Slim\App $app) {
             $response->getBody()->write(count($params));
             $response->getBody()->write("  ");
             $response->getBody()->write($params[0]);
-            $response->getBody()->write("  ");
+            $response->getBody()->write("  a");
             $response->getBody()->write(is_int($params[1]));
-            $response->getBody()->write("  ");
+            $response->getBody()->write("  b");
             $response->getBody()->write(count($params) == 2);
-            $response->getBody()->write("  ");
+            $response->getBody()->write("  c");
             $response->getBody()->write($params[0] == 'id');
             $response->getBody()->write("  ");
 
