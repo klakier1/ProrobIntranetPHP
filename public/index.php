@@ -141,8 +141,58 @@ $app->group('/api', function(\Slim\App $app) {
         $token = $request->getAttribute("decoded_token_data");
         $params = array_filter(explode('/', $args['params']));
 
+        switch(checkTokenData($token)){
+            case TOKEN_ADMIN:{
+                /* Admin authorized  */
+              
+                /* no args          - all users, all data*************************************************** */
+                if(count($params) == 0 ){
+                    $db = new DbOperation;
+                    $result = $db->getAllUsers($ret);
+                    
+                    if($result == GET_USERS_SUCCESS){
+                        return $response = standardResponse($response, 200, false, 'Get users successfull', $ret); 
+                    }else if($result == GET_USERS_FAILURE){
+                        return $response = standardResponse($response, 422, true, 'Some error occurred');         
+                    }else if($result == DB_ERROR){
+                        return $response = standardResponse($response, 500, true, 'Database error');  
+                    }
+                }
+                /****************************************************************************************** */ 
+            }
+            case TOKEN_EMPLOYEE:{
+
+                /* /user/id/[0-9]   -one user, short data************************************************** */
+                if(count($params) == 2 && $params[0] == 'id'){
+                    $request_id = intval($params[1]);
+                    if($token['id'] == $request_id )
+                    {
+                        $db = new DbOperation;
+                        $result = $db->getUserShort($request_id, $ret);
+                        
+                        if($result == GET_USERS_SUCCESS){
+                            return $response = standardResponse($response, 200, false, 'Get user successfull', $ret); 
+                        }else if($result == GET_USERS_FAILURE){
+                            return $response = standardResponse($response, 422, true, 'Some error occurred');         
+                        }else if($result == DB_ERROR){
+                            return $response = standardResponse($response, 500, true, 'Database error');  
+                        }
+                    }
+                }
+                return $response = standardResponse($response, 400, true, 'Bad Request');
+                /**************************************************************************************** */
+
+                break;
+            }
+            case TOKEN_ERROR:{
+                return $response = standardResponse($response, 400, true, 'Token invalid'); 
+            }
+        }
+
         if (checkTokenData($token) == TOKEN_ADMIN) {
             /* Admin authorized  */
+
+            /* /            - all users, all data*/
             if(count($params) == 0 ){
                 $db = new DbOperation;
                 $result = $db->getAllUsers($ret);
@@ -162,34 +212,8 @@ $app->group('/api', function(\Slim\App $app) {
                 return $response = standardResponse($response, 400, true, 'Bad Request'); 
             }
         }elseif (checkTokenData($token) == TOKEN_EMPLOYEE) {
-            // /user/id/[0-9]
 
-            $response->getBody()->write(count($params));
-            $response->getBody()->write("  ");
-            $response->getBody()->write($params[0]);
-            $response->getBody()->write("  a");
-            $response->getBody()->write(is_int($params[1]));
-            $response->getBody()->write("  b");
-            $response->getBody()->write(count($params) == 2);
-            $response->getBody()->write("  c");
-            $response->getBody()->write($params[0] == 'id');
-            $response->getBody()->write("  ");
 
-            if(count($params) == 2 && $params[0] == 'id'){
-                $response->getBody()->write("OK");
-                $request_id = intval($params[1]);
-                if($token['id'] == $request_id )
-                {
-                    $db = new DbOperation;
-                    $result = $db->getUserShort($request_id, $ret);
-                    return $response = standardResponse($response, 200, false, 'Get user successfull', $ret); 
-                }
-            }
-            return $response = standardResponse($response, 400, true, 'Bad Request');
-
-        }elseif (checkTokenData($token) == TOKEN_ERROR){
-            return $response = standardResponse($response, 400, true, 'Token invalid'); 
-        }
     });
 
      /*
