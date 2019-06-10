@@ -188,32 +188,6 @@ $app->group('/api', function(\Slim\App $app) {
                 return $response = standardResponse($response, 400, true, 'Token invalid'); 
             }
         }
-
-        if (checkTokenData($token) == TOKEN_ADMIN) {
-            /* Admin authorized  */
-
-            /* /            - all users, all data*/
-            if(count($params) == 0 ){
-                $db = new DbOperation;
-                $result = $db->getAllUsers($ret);
-                
-                if($result == GET_USERS_SUCCESS){
-                    return $response = standardResponse($response, 200, false, 'Get users successfull', $ret); 
-                }else if($result == GET_USERS_FAILURE){
-                    return $response = standardResponse($response, 422, true, 'Some error occurred');         
-                }else if($result == DB_ERROR){
-                    return $response = standardResponse($response, 500, true, 'Database error');  
-                }
-                return $response;
-
-            }elseif(count($params) != 0){
-                return $response = standardResponse($response, 400, true, 'Bad Request'); 
-            }else{
-                return $response = standardResponse($response, 400, true, 'Bad Request'); 
-            }
-        }elseif (checkTokenData($token) == TOKEN_EMPLOYEE) {
-
-
     });
 
      /*
