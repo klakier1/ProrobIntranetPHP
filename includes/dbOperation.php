@@ -158,8 +158,12 @@
             $query->bindValue(':id', $id, PDO::PARAM_STR);
 
             if($query->execute()){
-                $result = $query->fetchAll(PDO::FETCH_ASSOC);
-                return GET_USERS_SUCCESS;
+                if($result->rowCount() == 1){
+                    $result = $query->fetchAll(PDO::FETCH_ASSOC);
+                    return GET_USERS_SUCCESS;
+                }else{
+                    return GET_USERS_NOT_FOUND;
+                }
             }else{
                 return GET_USERS_FAILURE;
             }

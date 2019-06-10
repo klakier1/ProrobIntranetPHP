@@ -173,7 +173,9 @@ $app->group('/api', function(\Slim\App $app) {
                         if($result == GET_USERS_SUCCESS){
                             return $response = standardResponse($response, 200, false, 'Get user successfull', $ret); 
                         }else if($result == GET_USERS_FAILURE){
-                            return $response = standardResponse($response, 422, true, 'Some error occurred');         
+                            return $response = standardResponse($response, 422, true, 'Some error occurred');    
+                        }else if($result == GET_USERS_NOT_FOUND){
+                            return $response = standardResponse($response, 422, true, 'User not found');       
                         }else if($result == DB_ERROR){
                             return $response = standardResponse($response, 500, true, 'Database error');  
                         }
