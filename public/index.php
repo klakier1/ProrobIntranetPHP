@@ -141,7 +141,7 @@ $app->group('/api', function(\Slim\App $app) {
         $token = $request->getAttribute("decoded_token_data");
         $params = array_filter(explode('/', $args['params']));
 
-        switch(checkTokenData($token)){
+        switch($role = checkTokenData($token)){
             case TOKEN_ADMIN:{
                 /* Admin authorized  */
               
@@ -165,7 +165,7 @@ $app->group('/api', function(\Slim\App $app) {
                 /* /user/id/[0-9]   -one user, short data************************************************** */
                 if(count($params) == 2 && $params[0] == 'id'){
                     $request_id = intval($params[1]);
-                    if($token['id'] == $request_id )
+                    if($token['id'] == $request_id || $role == TOKEN_ADMIN) //admin can get any user
                     {
                         $db = new DbOperation;
                         $result = $db->getUserShort($request_id, $ret);
