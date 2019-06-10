@@ -137,11 +137,12 @@ $app->group('/api', function(\Slim\App $app) {
         method: GET
     */
     $app->get('/user[/{params:.*}]', function(Request $request, Response $response, $args){
+        //get arguments
         $token = $request->getAttribute("decoded_token_data");
+        $params = array_filter(explode('/', $args['params']));
+
         if (checkTokenData($token) == TOKEN_ADMIN) {
             /* Admin authorized  */
-            $params = array_filter(explode('/', $args['params']));
-            
             if(count($params) == 0 ){
                 $db = new DbOperation;
                 $result = $db->getAllUsers($ret);
@@ -161,9 +162,19 @@ $app->group('/api', function(\Slim\App $app) {
                 return $response = standardResponse($response, 400, true, 'Bad Request'); 
             }
         }elseif (checkTokenData($token) == TOKEN_EMPLOYEE) {
-            /* No scope so respond with 401 Unauthorized */
-            return $response = standardResponse($response, 401, true, 'No admin privileges'); 
-        }else{
+            // /user/id/[0-9]
+            if(count($params) == 2 && $params[0] == 'id' && is_int($params[1])){
+                $request_id = $params[1];
+                if($token['id'] == $request_id )
+                {
+                    $db = new DbOperation;
+                    $result = $db->getAllUsers($request_id, $ret);
+                    return $response = standardResponse($response, 200, false, 'Get user successfull', $ret); 
+                }
+            }
+            return $response = standardResponse($response, 400, true, 'Bad Request');
+
+        }elseif (checkTokenData($token) == TOKEN_ERROR){
             return $response = standardResponse($response, 400, true, 'Token invalid'); 
         }
     });
