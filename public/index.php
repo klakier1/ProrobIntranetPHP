@@ -49,7 +49,7 @@ $app->post('/login', function (Request $request, Response $response, array $args
     if(!haveEmptyParameters(array('email' ,'password'), $request, $response)){ 
         $request_data = $request->getParsedBody(); 
         $db = new DbOperation; 
-        $id = -1;
+        $user_id = -1;
         $role = "";
         $result = $db->login(
             $request_data['email'], 
@@ -64,7 +64,7 @@ $app->post('/login', function (Request $request, Response $response, array $args
         }else if($result == USER_PASSWORD_DO_NOT_MATCH){
             return $response = standardResponse($response, 401, true, 'Wrong password');  
         }else if($result == USER_AUTHENTICATED){
-            $token = JWT::encode(['id' => $id, 'role' => $role, 'version' => TOKEN_VERSION], getenv("JWT_SECRET"), "HS256");
+            $token = JWT::encode(['id' => $user_id, 'role' => $role, 'version' => TOKEN_VERSION], getenv("JWT_SECRET"), "HS256");
             return $response = standardResponse($response, 200, false, 'Token generated', ['token' => $token]);
         }else if($result == DB_ERROR){
             return $response = standardResponse($response, 500, true, 'Database error');
@@ -153,6 +153,9 @@ $app->group('/api', function(\Slim\App $app) {
                     return $response = standardResponse($response, 500, true, 'Database error');  
                 }
                 return $response;
+
+            }elseif(count($params) != 0){
+                return $response = standardResponse($response, 400, true, 'Bad Request'); 
             }else{
                 return $response = standardResponse($response, 400, true, 'Bad Request'); 
             }
