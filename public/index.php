@@ -164,9 +164,15 @@ $app->group('/api', function(\Slim\App $app) {
         }elseif (checkTokenData($token) == TOKEN_EMPLOYEE) {
             // /user/id/[0-9]
 
-            $response->getBody()->write("OK");
+            $response->getBody()->write(count($params));
+            $response->getBody()->write("  ");
+            $response->getBody()->write($params[0]);
+            $response->getBody()->write("  ");
+            $response->getBody()->write($params[1]);
+            $response->getBody()->write("  ");
 
             if(count($params) == 2 && $params[0] == 'id' && is_int($params[1])){
+                $response->getBody()->write("OK");
                 $request_id = $params[1];
                 if($token['id'] == $request_id )
                 {
