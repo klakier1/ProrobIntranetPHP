@@ -1,6 +1,5 @@
 <?php 
 
-    define('TOKEN_VERSION', "V2");
     define('TOKEN_ADMIN', "admin");
     define('TOKEN_EMPLOYEE', "employee");
     define('TOKEN_ERROR', "error");

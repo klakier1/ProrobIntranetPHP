@@ -2,7 +2,7 @@
 
     function checkTokenData($token)
     {
-        if($token['version'] == TOKEN_VERSION){
+        if($token['version'] == getenv("TOKEN_VERSION")){
             $db = new DbOperation; 
             $id = $token['id'];
             if($db->isUserActive($id)){
@@ -22,6 +22,11 @@
         }
 
         return TOKEN_ERROR;
+    }
+
+    function getToken($user_id, $role)
+    {
+        return JWT::encode(['id' => $user_id, 'role' => $role, 'version' => getenv("TOKEN_VERSION")], getenv("JWT_SECRET"), "HS256");
     }
 
 

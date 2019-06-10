@@ -16,6 +16,7 @@ use \Firebase\JWT\JWT;
 require '../vendor/autoload.php';
 require '../includes/responseProcess.php';
 require '../includes/dbOperation.php';
+require '../includes/token.php';
 
 $app = new \Slim\App([
     'settings'=>[
@@ -64,7 +65,7 @@ $app->post('/login', function (Request $request, Response $response, array $args
         }else if($result == USER_PASSWORD_DO_NOT_MATCH){
             return $response = standardResponse($response, 401, true, 'Wrong password');  
         }else if($result == USER_AUTHENTICATED){
-            $token = JWT::encode(['id' => $user_id, 'role' => $role, 'version' => TOKEN_VERSION], getenv("JWT_SECRET"), "HS256");
+            $token = getToken($user_id, $role);
             return $response = standardResponse($response, 200, false, 'Token generated', ['token' => $token]);
         }else if($result == DB_ERROR){
             return $response = standardResponse($response, 500, true, 'Database error');
@@ -83,7 +84,7 @@ $app->group('/api', function(\Slim\App $app) {
     */
     $app->post('/user', function(Request $request, Response $response){
         $token = $request->getAttribute("decoded_token_data");
-        if ($token['role'] == admin) {
+        if (checkTokenData($token) == TOKEN_ADMIN){
             /* Admin authorized */
             if(!haveEmptyParameters(array(
                 'email', 
@@ -137,7 +138,7 @@ $app->group('/api', function(\Slim\App $app) {
     */
     $app->get('/user[/{params:.*}]', function(Request $request, Response $response, $args){
         $token = $request->getAttribute("decoded_token_data");
-        if ($token['role'] == admin) {
+        if (checkTokenData($token) == TOKEN_ADMIN) {
             /* Admin authorized  */
             $params = array_filter(explode('/', $args['params']));
             
@@ -172,7 +173,7 @@ $app->group('/api', function(\Slim\App $app) {
     */
     $app->delete('/user[/{params:.*}]', function(Request $request, Response $response, $args){
         $token = $request->getAttribute("decoded_token_data");
-        if ($token['role'] == admin) {
+        if (checkTokenData($token) == TOKEN_ADMIN) {
             /* Admin authorized  */
             $params = array_filter(explode('/', $args['params']));
 
