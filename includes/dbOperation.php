@@ -118,7 +118,7 @@
             return count($result);
         }
 
-        private function isUserActive($id){
+        public function isUserActive($id){
             $query = $this->con->prepare('SELECT active FROM public.users WHERE id = :id');
             $query->bindValue(':id', $id, PDO::PARAM_STR);
             $query->execute();
@@ -126,7 +126,7 @@
             return filter_var($result['active'], FILTER_VALIDATE_BOOLEAN);
         }
 
-        private function getUserRole($id){
+        public function getUserRole($id){
             $query = $this->con->prepare('SELECT role FROM public.users WHERE id = :id');
             $query->bindValue(':id', $id, PDO::PARAM_STR);
             $query->execute();
