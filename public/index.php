@@ -160,9 +160,11 @@ $app->group('/api', function(\Slim\App $app) {
             }else{
                 return $response = standardResponse($response, 400, true, 'Bad Request'); 
             }
-        }else{
+        }elseif (checkTokenData($token) == TOKEN_EMPLOYEE) {
             /* No scope so respond with 401 Unauthorized */
             return $response = standardResponse($response, 401, true, 'No admin privileges'); 
+        }else{
+            return $response = standardResponse($response, 400, true, 'Token invalid'); 
         }
     });
 
