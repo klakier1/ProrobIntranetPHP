@@ -181,7 +181,7 @@ $app->group('/api', function(\Slim\App $app) {
                 if($token['id'] == $request_id )
                 {
                     $db = new DbOperation;
-                    $result = $db->getAllUsers($request_id, $ret);
+                    $result = $db->getUserShort($request_id, $ret);
                     return $response = standardResponse($response, 200, false, 'Get user successfull', $ret); 
                 }
             }
