@@ -140,7 +140,10 @@
             
             $query = $this->con->prepare('SELECT * FROM public.users', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
             if($query->execute()){
-                $result = $query->fetchAll(PDO::FETCH_ASSOC);
+                $result['data_length'] = $query->rowCount();
+                while($row = $query->fetch(PDO::FETCH_ASSOC)){
+                    $result['data'][] = $row;
+                }
                 return GET_USERS_SUCCESS;
             }else{
                 return GET_USERS_FAILURE;
@@ -159,6 +162,7 @@
 
             if($query->execute()){
                 if($query->rowCount() == 1){
+                    $result['data_length'] = $query->rowCount();
                     $result['data'][] = $query->fetch(PDO::FETCH_ASSOC);
                     return GET_USERS_SUCCESS;
                 }else{
