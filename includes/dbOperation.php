@@ -159,7 +159,7 @@
 
             if($query->execute()){
                 if($query->rowCount() == 1){
-                    $result = $query->fetch(PDO::FETCH_ASSOC);
+                    $result['data'][] = $query->fetch(PDO::FETCH_ASSOC);
                     return GET_USERS_SUCCESS;
                 }else{
                     return GET_USERS_NOT_FOUND;
