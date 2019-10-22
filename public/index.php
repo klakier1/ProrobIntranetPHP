@@ -262,7 +262,7 @@ $app->group('/api', function(\Slim\App $app) {
             case TOKEN_ADMIN:{
                 /* Admin authorized  */
               
-                /* no args          - all users, all timesheets*************************************************** */
+                /* no args         - all users, all timesheets*************************************************** */
                 if(count($params) == 0 ){
                     $db = new DbOperation;
                     //TODO
