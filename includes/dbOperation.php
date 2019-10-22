@@ -206,5 +206,26 @@
                 return USER_NOT_FOUND;
             }
         }
+
+
+        //TIMESHEET OPERATIONS ******************************************
+        public function getTimesheet($id, &$result){
+            if($this->con == null)
+                return DB_ERROR;
+
+            $query = $this->con->prepare(
+                'SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at
+                    FROM public.timesheets WHERE user_id = :id;',
+                array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+            $query->bindValue(':id', $id, PDO::PARAM_STR);
+
+            if($query->execute()){
+                $result['data_length'] = $query->rowCount();
+                $result['data'][] = $query->fetch(PDO::FETCH_ASSOC);
+                return GET_TIMESHEET_SUCCESS;
+            }else{
+                return GET_TIMESHEET_FAILURE;
+            }
+        }
     }
 ?>

@@ -19,3 +19,5 @@
     define('GET_USERS_FAILURE', 402);
     define('DELETE_USER_SUCCESS', 501);
     define('DELETE_USER_FAILURE', 502);
+    define('GET_TIMESHEET_SUCCESS', 601);
+    define('GET_TIMESHEET_FAILURE', 602);

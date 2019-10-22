@@ -192,7 +192,7 @@ $app->group('/api', function(\Slim\App $app) {
         }
     });
 
-     /*
+    /*
         endpoint: user
         parameters: user/email/... ;  user/user_id/...
         method: DELETE
@@ -247,6 +247,68 @@ $app->group('/api', function(\Slim\App $app) {
             return $response = standardResponse($response, 401, true, 'No admin privileges'); 
         }
     });
+
+    /*
+        endpoint: timesheet
+        parameters: timesheet/user_id/...
+        method: GET
+    */
+    $app->get('/user[/{params:.*}]', function(Request $request, Response $response, $args){
+        //get arguments
+        $token = $request->getAttribute("decoded_token_data");
+        $params = array_filter(explode('/', $args['params']));
+
+        switch($role = checkTokenData($token)){
+            case TOKEN_ADMIN:{
+                /* Admin authorized  */
+              
+                /* no args          - all users, all timesheets*************************************************** */
+                if(count($params) == 0 ){
+                    $db = new DbOperation;
+                    //TODO
+                    //$result = $db->getAllUsers($ret);
+                    $result = GET_TIMESHEET_FAILURE;
+
+                    if($result == GET_TIMESHEET_SUCCESS){
+                        return $response = standardResponse($response, 200, false, 'Get timesheet successfull', $ret); 
+                    }else if($result == GET_TIMESHEET_FAILURE){
+                        return $response = standardResponse($response, 422, true, 'Some error occurred, TODO');         
+                    }else if($result == DB_ERROR){
+                        return $response = standardResponse($response, 500, true, 'Database error');  
+                    }
+                }
+                /****************************************************************************************** */ 
+            }
+            case TOKEN_EMPLOYEE:{
+
+                /* /timesheet/id/[0-9]   -one user, all data************************************************** */
+                if(count($params) == 2 && $params[0] == 'id'){
+                    $request_id = intval($params[1]);
+                    if($token['id'] == $request_id || $role == TOKEN_ADMIN) //admin can get any user
+                    {
+                        $db = new DbOperation;
+                        $result = $db->getTimesheet($request_id, $ret);
+                        
+                        if($result == GET_TIMESHEET_SUCCESS){
+                            return $response = standardResponse($response, 200, false, 'Get timesheet successfull', $ret); 
+                        }else if($result == GET_TIMESHEET_FAILURE){
+                            return $response = standardResponse($response, 422, true, 'Some error occurred');     
+                        }else if($result == DB_ERROR){
+                            return $response = standardResponse($response, 500, true, 'Database error');  
+                        }
+                    }
+                }
+                return $response = standardResponse($response, 400, true, 'Bad Request');
+                /**************************************************************************************** */
+
+                break;
+            }
+            case TOKEN_ERROR:{
+                return $response = standardResponse($response, 400, true, 'Token invalid'); 
+            }
+        }
+    });
+
 });
 
 function haveEmptyParameters($required_params, Request $request, Response &$response){
