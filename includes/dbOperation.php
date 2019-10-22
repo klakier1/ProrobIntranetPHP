@@ -221,7 +221,10 @@
 
             if($query->execute()){
                 $result['data_length'] = $query->rowCount();
-                $result['data'][] = $query->fetch(PDO::FETCH_ASSOC);
+                while($row = $query->fetch(PDO::FETCH_ASSOC)){
+                    $result['data'][] = $row;
+                }
+
                 return GET_TIMESHEET_SUCCESS;
             }else{
                 return GET_TIMESHEET_FAILURE;
