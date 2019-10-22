@@ -253,7 +253,7 @@ $app->group('/api', function(\Slim\App $app) {
         parameters: timesheet/user_id/...
         method: GET
     */
-    $app->get('/user[/{params:.*}]', function(Request $request, Response $response, $args){
+    $app->get('/timesheet[/{params:.*}]', function(Request $request, Response $response, $args){
         //get arguments
         $token = $request->getAttribute("decoded_token_data");
         $params = array_filter(explode('/', $args['params']));
