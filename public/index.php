@@ -334,7 +334,7 @@ $app->group('/api', function(\Slim\App $app) {
 
                 $request_data = $request->getParsedBody(); 
                 $db = new DbOperation; 
-                $result = $db->createTimesheerRow(
+                $result = $db->createTimesheetRow(
                     $token['id'], 
                     $request_data['date'], 
                     $request_data['from'], 
