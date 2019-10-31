@@ -276,7 +276,8 @@
             $query->bindValue(':status', $notify, PDO::PARAM_BOOL);
             $query->bindValue(':created_at', $days_availabe, PDO::PARAM_LOB);
             $query->bindValue(':updated_at', $notify, PDO::PARAM_LOB);
-
+            echo $query->errorInfo();
+            
             if($query->execute()){
                 return INSERT_TIMESHEETROW_SUCCESS;
             }else{
