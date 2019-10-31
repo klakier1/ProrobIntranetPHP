@@ -230,5 +230,58 @@
                 return GET_TIMESHEET_FAILURE;
             }
         }
+
+        public function createTimesheetRow($user_id, $date, $from, $to, $customer_break, $statutory_break, $comments, $project_id, $company_id, $status, $created_at, $updated_at){
+            if($this->con == null)
+                return DB_ERROR;
+            
+            $query = $this->con->prepare(
+                "INSERT INTO public.timesheets(
+                    user_id, 
+                    date, 
+                    from, 
+                    to, 
+                    customer_break, 
+                    statutory_break, 
+                    comments, 
+                    project_id, 
+                    company_id, 
+                    status, 
+                    created_at, 
+                    updated_at)
+                VALUES ( 
+                    :user_id, 
+                    :date, 
+                    :from, 
+                    :to, 
+                    :customer_break, 
+                    :statutory_break, 
+                    :comments, 
+                    :project_id, 
+                    :company_id, 
+                    :status, 
+                    :created_at, 
+                    :updated_at);"
+            );
+
+            $query->bindValue(':user_id', $email, PDO::PARAM_INT);
+            $query->bindValue(':date', $hashed_pass, PDO::PARAM__STR);
+            $query->bindValue(':from', $role, PDO::PARAM_STR);
+            $query->bindValue(':to', $active, PDO::PARAM__STR);
+            $query->bindValue(':customer_break', $first_name, PDO::PARAM_STR);
+            $query->bindValue(':statutory_break', $last_name, PDO::PARAM_STR);
+            $query->bindValue(':comments', $title, PDO::PARAM_STR);
+            $query->bindValue(':project_id', $phone, PDO::PARAM_INT);
+            $query->bindValue(':company_id', $days_availabe, PDO::PARAM_INT);
+            $query->bindValue(':status', $notify, PDO::PARAM_BOOL);
+            $query->bindValue(':created_at', $days_availabe, PDO::PARAM_STR);
+            $query->bindValue(':updated_at', $notify, PDO::PARAM_STR);
+
+            if($query->execute()){
+                return INSERT_TIMESHEETROW_SUCCESS;
+            }else{
+                return INSERT_TIMESHEETROW_FAILURE;
+            }
+        }
     }
 ?>

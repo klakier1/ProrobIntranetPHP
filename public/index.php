@@ -309,6 +309,60 @@ $app->group('/api', function(\Slim\App $app) {
         }
     });
 
+    /*
+        endpoint: timesheet
+        parameters: data, from, to, customer_break, statutory_break, comments, project_id, comapny_id, status, created_at, updated_at
+        method: POST
+    */
+
+    $app->post('/timesheet', function(Request $request, Response $response){
+        $token = $request->getAttribute("decoded_token_data");
+        if (checkTokenData($token) == TOKEN_ADMIN || checkTokenData($token) == TOKEN_EMPLOYEE){
+            if(!haveEmptyParameters(array( 
+                'date', 
+                'from', 
+                'to', 
+                'customer_break', 
+                'statutory_break', 
+                'comments',
+                'project_id', 
+                'company_id', 
+                'status', 
+                'created_at', 
+                'updated_at'
+                ), $request, $response)){
+
+                $request_data = $request->getParsedBody(); 
+                $db = new DbOperation; 
+                $result = $db->createTimesheerRow(
+                    $token['id'], 
+                    $request_data['date'], 
+                    $request_data['from'], 
+                    $request_data['to'], 
+                    $request_data['customer_break'], 
+                    $request_data['statutory_break'], 
+                    $request_data['comments'], 
+                    $request_data['project_id'], 
+                    $request_data['company_id'], 
+                    $request_data['status'],
+                    $request_data['created_at'],
+                    $request_data['updated_at']
+                );
+                
+                if($result == INSERT_TIMESHEETROW_SUCCESS){
+                    return $response = standardResponse($response, 201, false, 'TimesheetRow inserted'); 
+                }else if($result == INSERT_TIMESHEETROW_FAILURE){
+                    return $response = standardResponse($response, 422, true, 'Some error occurred');        
+                }else if($result == DB_ERROR){
+                    return $response = standardResponse($response, 500, true, 'Database error');  
+                }
+            }else{
+                return $response;  
+            }
+        } else {
+            return $response = standardResponse($response, 401, true, 'No privileges'); 
+        }
+    });
 });
 
 function haveEmptyParameters($required_params, Request $request, Response &$response){
