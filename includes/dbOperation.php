@@ -265,9 +265,9 @@
             );
 
             $query->bindValue(':user_id', $email, PDO::PARAM_INT);
-            $query->bindValue(':date', $hashed_pass, PDO::PARAM__STR);
+            $query->bindValue(':date', $hashed_pass, PDO::PARAM_STR);
             $query->bindValue(':from', $role, PDO::PARAM_STR);
-            $query->bindValue(':to', $active, PDO::PARAM__STR);
+            $query->bindValue(':to', $active, PDO::PARAM_STR);
             $query->bindValue(':customer_break', $first_name, PDO::PARAM_STR);
             $query->bindValue(':statutory_break', $last_name, PDO::PARAM_STR);
             $query->bindValue(':comments', $title, PDO::PARAM_STR);
