@@ -251,17 +251,17 @@
                     updated_at)
                 VALUES ( 
                     :user_id, 
-                    :date, 
-                    :from, 
-                    :to, 
-                    :customer_break, 
-                    :statutory_break, 
+                    date :date, 
+                    time :from, 
+                    time :to, 
+                    time :customer_break, 
+                    time :statutory_break, 
                     :comments, 
                     :project_id, 
                     :company_id, 
                     :status, 
-                    :created_at, 
-                    :updated_at);"
+                    timestamp :created_at, 
+                    timestamp :updated_at);"
             );
 
             $query->bindValue(':user_id', $email, PDO::PARAM_INT);
