@@ -239,8 +239,8 @@
                 "INSERT INTO public.timesheets(
                     user_id, 
                     date, 
-                    from, 
-                    to, 
+                    \"from\", 
+                    \"to\", 
                     customer_break, 
                     statutory_break, 
                     comments, 
