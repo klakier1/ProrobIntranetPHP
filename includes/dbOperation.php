@@ -264,18 +264,18 @@
                     :updated_at);"
             );
 
-            $query->bindValue(':user_id', $email, PDO::PARAM_INT);
-            $query->bindValue(':date', $hashed_pass, PDO::PARAM_LOB);
-            $query->bindValue(':from', $role, PDO::PARAM_LOB);
-            $query->bindValue(':to', $active, PDO::PARAM_LOB);
-            $query->bindValue(':customer_break', $first_name, PDO::PARAM_LOB);
-            $query->bindValue(':statutory_break', $last_name, PDO::PARAM_LOB);
-            $query->bindValue(':comments', $title, PDO::PARAM_STR);
-            $query->bindValue(':project_id', $phone, PDO::PARAM_INT);
-            $query->bindValue(':company_id', $days_availabe, PDO::PARAM_INT);
-            $query->bindValue(':status', $notify, PDO::PARAM_BOOL);
-            $query->bindValue(':created_at', $days_availabe, PDO::PARAM_LOB);
-            $query->bindValue(':updated_at', $notify, PDO::PARAM_LOB);
+            $query->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+            $query->bindValue(':date', $date, PDO::PARAM_LOB);
+            $query->bindValue(':from', $from, PDO::PARAM_LOB);
+            $query->bindValue(':to', $to, PDO::PARAM_LOB);
+            $query->bindValue(':customer_break', $customer_break, PDO::PARAM_LOB);
+            $query->bindValue(':statutory_break', $statutory_break, PDO::PARAM_LOB);
+            $query->bindValue(':comments', $comments, PDO::PARAM_STR);
+            $query->bindValue(':project_id', $project_id, PDO::PARAM_INT);
+            $query->bindValue(':company_id', $company_id, PDO::PARAM_INT);
+            $query->bindValue(':status', $status, PDO::PARAM_BOOL);
+            $query->bindValue(':created_at', $created_at, PDO::PARAM_LOB);
+            $query->bindValue(':updated_at', $updated_at, PDO::PARAM_LOB);
             $qwe = $query->errorInfo();
             var_dump($qwe);
             if($query->execute()){
