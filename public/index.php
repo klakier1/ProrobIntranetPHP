@@ -332,7 +332,7 @@ $app->group('/api', function(\Slim\App $app) {
                 'updated_at'
                 ), $request, $response)){
 
-                if(checkTokenData($token) == TOKEN_EMPLOYEE || $token['id'] != $request_data['user_id'])
+                if(checkTokenData($token) == TOKEN_EMPLOYEE && $token['id'] != $request_data['user_id'])
                     return $response = standardResponse($response, 401, true, 'Only admin can add timesheet row of other user'); 
 
                 $request_data = $request->getParsedBody(); 
