@@ -231,7 +231,7 @@
             }
         }
 
-        public function createTimesheetRow($user_id, $date, $from, $to, $customer_break, $statutory_break, $comments, $project_id, $company_id, $status, $created_at, $updated_at){
+        public function createTimesheetRow($user_id, $date, $from, $to, $customer_break, $statutory_break, $comments, $project_id, $company_id, $status, $created_at, $updated_at, &$result){
             if($this->con == null)
                 return DB_ERROR;
             
@@ -276,9 +276,9 @@
             $query->bindValue(':status', $status, PDO::PARAM_BOOL);
             $query->bindValue(':created_at', $created_at, PDO::PARAM_STR);
             $query->bindValue(':updated_at', $updated_at, PDO::PARAM_STR);
-            $qwe = $query->errorInfo();
-            var_dump($qwe);
+
             if($query->execute()){
+                $result['id'] = $this->con->lastInsertId('public.timesheets_id_seq');
                 return INSERT_TIMESHEETROW_SUCCESS;
             }else{
                 return INSERT_TIMESHEETROW_FAILURE;

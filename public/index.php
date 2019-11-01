@@ -266,7 +266,6 @@ $app->group('/api', function(\Slim\App $app) {
                 if(count($params) == 0 ){
                     $db = new DbOperation;
                     //TODO
-                    //$result = $db->getAllUsers($ret);
                     $result = GET_TIMESHEET_FAILURE;
 
                     if($result == GET_TIMESHEET_SUCCESS){
@@ -346,11 +345,12 @@ $app->group('/api', function(\Slim\App $app) {
                     $request_data['company_id'], 
                     $request_data['status'],
                     $request_data['created_at'],
-                    $request_data['updated_at']
+                    $request_data['updated_at'],
+                    $result
                 );
                 
                 if($result == INSERT_TIMESHEETROW_SUCCESS){
-                    return $response = standardResponse($response, 201, false, 'TimesheetRow inserted'); 
+                    return $response = standardResponse($response, 201, false, 'TimesheetRow inserted', $result); 
                 }else if($result == INSERT_TIMESHEETROW_FAILURE){
                     return $response = standardResponse($response, 422, true, 'Some error occurred');        
                 }else if($result == DB_ERROR){
