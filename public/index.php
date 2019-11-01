@@ -310,7 +310,7 @@ $app->group('/api', function(\Slim\App $app) {
 
     /*
         endpoint: timesheet
-        parameters: data, from, to, customer_break, statutory_break, comments, project_id, comapny_id, status, created_at, updated_at
+        parameters: user_id, data, from, to, customer_break, statutory_break, comments, project_id, comapny_id, status, created_at, updated_at
         method: POST
     */
 
@@ -318,6 +318,7 @@ $app->group('/api', function(\Slim\App $app) {
         $token = $request->getAttribute("decoded_token_data");
         if (checkTokenData($token) == TOKEN_ADMIN || checkTokenData($token) == TOKEN_EMPLOYEE){
             if(!haveEmptyParameters(array( 
+                'user_id',
                 'date', 
                 'from', 
                 'to', 
@@ -330,6 +331,9 @@ $app->group('/api', function(\Slim\App $app) {
                 'created_at', 
                 'updated_at'
                 ), $request, $response)){
+
+                if(checkTokenData($token) == TOKEN_EMPLOYEE || $token['id'] != $request_data['user_id'])
+                    return $response = standardResponse($response, 401, true, 'Only admin can add timesheet row of other user'); 
 
                 $request_data = $request->getParsedBody(); 
                 $db = new DbOperation; 
