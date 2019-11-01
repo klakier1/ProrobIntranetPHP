@@ -346,11 +346,11 @@ $app->group('/api', function(\Slim\App $app) {
                     $request_data['status'],
                     $request_data['created_at'],
                     $request_data['updated_at'],
-                    $result
+                    $ret
                 );
                 
                 if($result == INSERT_TIMESHEETROW_SUCCESS){
-                    return $response = standardResponse($response, 201, false, 'TimesheetRow inserted', $result); 
+                    return $response = standardResponse($response, 201, false, 'TimesheetRow inserted', $ret); 
                 }else if($result == INSERT_TIMESHEETROW_FAILURE){
                     return $response = standardResponse($response, 422, true, 'Some error occurred');        
                 }else if($result == DB_ERROR){
