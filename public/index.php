@@ -324,7 +324,7 @@ $app->group('/api', function(\Slim\App $app) {
                 'to', 
                 'customer_break', 
                 'statutory_break', 
-                'comments',
+                //'comments',
                 'project_id', 
                 'company_id', 
                 'status', 
