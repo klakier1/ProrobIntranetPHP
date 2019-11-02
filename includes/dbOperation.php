@@ -327,7 +327,7 @@
             }
         }
 
-        public function deleteTimeshetRowById($id){
+        public function deleteTimesheetRowById($id){
             if($this->con == null)
                 return DB_ERROR;
             

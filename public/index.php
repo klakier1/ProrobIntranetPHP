@@ -1,12 +1,12 @@
 <?php
 if (PHP_SAPI == 'cli-server') {
-    // To help the built-in PHP dev server, check if the request was actually for
-    // something which should probably be served as a static file
-    $url  = parse_url($_SERVER['REQUEST_URI']);
-    $file = __DIR__ . $url['path'];
-    if (is_file($file)) {
-        return false;
-    }
+	// To help the built-in PHP dev server, check if the request was actually for
+	// something which should probably be served as a static file
+	$url  = parse_url($_SERVER['REQUEST_URI']);
+	$file = __DIR__ . $url['path'];
+	if (is_file($file)) {
+		return false;
+	}
 }
 
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -19,429 +19,427 @@ require '../includes/dbOperation.php';
 require '../includes/token.php';
 
 $app = new \Slim\App([
-    'settings'=>[
-        'displayErrorDetails'=>true
-    ]
+	'settings'=>[
+		'displayErrorDetails'=>true
+	]
 ]);
 
 // Register middleware
 require '../src/middleware.php';
 
 $app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
-    $name = $args['name'];
-    $response->getBody()->write("Hello, $name");
+	$name = $args['name'];
+	$response->getBody()->write("Hello, $name");
 
 
-    /*$db = new DbConnect();
+	/*$db = new DbConnect();
 
-    if($db->connect() != null){
-        $response->getBody()->write(' Connection OK');
-    }*/
+	if($db->connect() != null){
+		$response->getBody()->write(' Connection OK');
+	}*/
 
-    return $response;
+	return $response;
 });
 
 /*
-    endpoint: login
-    parameters: email, password
-    method: POST
+	endpoint: login
+	parameters: email, password
+	method: POST
 */
 $app->post('/login', function (Request $request, Response $response, array $args) {
-    if(!haveEmptyParameters(array('email' ,'password'), $request, $response)){ 
-        $request_data = $request->getParsedBody(); 
-        $db = new DbOperation; 
-        $user_id = -1;
-        $role = "";
-        $result = $db->login(
-            $request_data['email'], 
-            $request_data['password'], 
-            $user_id, 
-            $role);
-    
-        if($result == USER_NOT_FOUND){
-            return $response = standardResponse($response, 422, true, 'User not found');
-        }else if($result == USER_NOT_ACTIVE){
-            return $response = standardResponse($response, 422, true, 'User not active'); 
-        }else if($result == USER_PASSWORD_DO_NOT_MATCH){
-            return $response = standardResponse($response, 401, true, 'Wrong password');  
-        }else if($result == USER_AUTHENTICATED){
-            $token = getToken($user_id, $role);
-            return $response = standardResponse($response, 200, false, 'Token generated', ['token' => $token]);
-        }else if($result == DB_ERROR){
-            return $response = standardResponse($response, 500, true, 'Database error');
-        }
-    }else{
-        return $response;
-    }  
+	if(!haveEmptyParameters(array('email' ,'password'), $request, $response)){
+		$request_data = $request->getParsedBody();
+		$db = new DbOperation;
+		$user_id = -1;
+		$role = "";
+		$result = $db->login(
+			$request_data['email'],
+			$request_data['password'],
+			$user_id,
+			$role);
+
+		if($result == USER_NOT_FOUND){
+			return $response = standardResponse($response, 422, true, 'User not found');
+		}else if($result == USER_NOT_ACTIVE){
+			return $response = standardResponse($response, 422, true, 'User not active');
+		}else if($result == USER_PASSWORD_DO_NOT_MATCH){
+			return $response = standardResponse($response, 401, true, 'Wrong password');
+		}else if($result == USER_AUTHENTICATED){
+			$token = getToken($user_id, $role);
+			return $response = standardResponse($response, 200, false, 'Token generated', ['token' => $token]);
+		}else if($result == DB_ERROR){
+			return $response = standardResponse($response, 500, true, 'Database error');
+		}
+	}else{
+		return $response;
+	}
 });
 
 $app->group('/api', function(\Slim\App $app) {
 
-    /*
-        endpoint: user
-        parameters: email, password, name, surname
-        method: POST
-    */
-    $app->post('/user', function(Request $request, Response $response){
-        $token = $request->getAttribute("decoded_token_data");
-        if (checkTokenData($token) == TOKEN_ADMIN){
-            /* Admin authorized */
-            if(!haveEmptyParameters(array(
-                'email', 
-                'pass', 
-                'role', 
-                'active', 
-                'first_name', 
-                'last_name', 
-                'title', 
-                'phone', 
-                'days_availabe', 
-                'notify'
-                ), $request, $response)){
+	/*
+		endpoint: user
+		parameters: email, password, name, surname
+		method: POST
+	*/
+	$app->post('/user', function(Request $request, Response $response){
+		$token = $request->getAttribute("decoded_token_data");
+		if (checkTokenData($token) == TOKEN_ADMIN){
+			/* Admin authorized */
+			if(!haveEmptyParameters(array(
+				'email',
+				'pass',
+				'role',
+				'active',
+				'first_name',
+				'last_name',
+				'title',
+				'phone',
+				'days_availabe',
+				'notify'
+				), $request, $response)){
 
-                $request_data = $request->getParsedBody(); 
-                $db = new DbOperation; 
-                $result = $db->createUser(
-                    $request_data['email'], 
-                    $request_data['pass'], 
-                    $request_data['role'], 
-                    $request_data['active'], 
-                    $request_data['first_name'], 
-                    $request_data['last_name'], 
-                    $request_data['title'], 
-                    $request_data['phone'], 
-                    $request_data['days_availabe'], 
-                    $request_data['notify']);
-                
-                if($result == USER_CREATED){
-                    return $response = standardResponse($response, 201, false, 'User created successfully'); 
-                }else if($result == USER_FAILURE){
-                    return $response = standardResponse($response, 422, true, 'Some error occurred');      
-                }else if($result == USER_EXISTS){
-                    return $response = standardResponse($response, 422, true, 'User Already Exists');    
-                }else if($result == DB_ERROR){
-                    return $response = standardResponse($response, 500, true, 'Database error');  
-                }
-            }else{
-                return $response;  
-            }
-        } else {
-            /* No scope so respond with 401 Unauthorized */
-            return $response = standardResponse($response, 401, true, 'No admin privileges'); 
-        }
-    });
+				$request_data = $request->getParsedBody();
+				$db = new DbOperation;
+				$result = $db->createUser(
+					$request_data['email'],
+					$request_data['pass'],
+					$request_data['role'],
+					$request_data['active'],
+					$request_data['first_name'],
+					$request_data['last_name'],
+					$request_data['title'],
+					$request_data['phone'],
+					$request_data['days_availabe'],
+					$request_data['notify']);
 
-    /*
-        endpoint: user
-        parameters:
-        method: GET
-    */
-    $app->get('/user[/{params:.*}]', function(Request $request, Response $response, $args){
-        //get arguments
-        $token = $request->getAttribute("decoded_token_data");
-        $params = array_filter(explode('/', $args['params']));
+				if($result == USER_CREATED){
+					return $response = standardResponse($response, 201, false, 'User created successfully');
+				}else if($result == USER_FAILURE){
+					return $response = standardResponse($response, 422, true, 'Some error occurred');
+				}else if($result == USER_EXISTS){
+					return $response = standardResponse($response, 422, true, 'User Already Exists');
+				}else if($result == DB_ERROR){
+					return $response = standardResponse($response, 500, true, 'Database error');
+				}
+			}else{
+				return $response;
+			}
+		} else {
+			/* No scope so respond with 401 Unauthorized */
+			return $response = standardResponse($response, 401, true, 'No admin privileges');
+		}
+	});
 
-        switch($role = checkTokenData($token)){
-            case TOKEN_ADMIN:{
-                /* Admin authorized  */
-              
-                /* no args          - all users, all data*************************************************** */
-                if(count($params) == 0 ){
-                    $db = new DbOperation;
-                    $result = $db->getAllUsers($ret);
-                    
-                    if($result == GET_USERS_SUCCESS){
-                        return $response = standardResponse($response, 200, false, 'Get users successfull', $ret); 
-                    }else if($result == GET_USERS_FAILURE){
-                        return $response = standardResponse($response, 422, true, 'Some error occurred');         
-                    }else if($result == DB_ERROR){
-                        return $response = standardResponse($response, 500, true, 'Database error');  
-                    }
-                }
-                /****************************************************************************************** */ 
-            }
-            case TOKEN_EMPLOYEE:{
+	/*
+		endpoint: user
+		parameters:
+		method: GET
+	*/
+	$app->get('/user[/{params:.*}]', function(Request $request, Response $response, $args){
+		//get arguments
+		$token = $request->getAttribute("decoded_token_data");
+		$params = array_filter(explode('/', $args['params']));
 
-                /* /user/id/[0-9]   -one user, short data************************************************** */
-                if(count($params) == 2 && $params[0] == 'id'){
-                    $request_id = intval($params[1]);
-                    if($token['id'] == $request_id || $role == TOKEN_ADMIN) //admin can get any user
-                    {
-                        $db = new DbOperation;
-                        $result = $db->getUserShort($request_id, $ret);
-                        
-                        if($result == GET_USERS_SUCCESS){
-                            return $response = standardResponse($response, 200, false, 'Get user successfull', $ret); 
-                        }else if($result == GET_USERS_FAILURE){
-                            return $response = standardResponse($response, 422, true, 'Some error occurred');    
-                        }else if($result == GET_USERS_NOT_FOUND){
-                            return $response = standardResponse($response, 422, true, 'User not found');       
-                        }else if($result == DB_ERROR){
-                            return $response = standardResponse($response, 500, true, 'Database error');  
-                        }
-                    }
-                }
-                return $response = standardResponse($response, 400, true, 'Bad Request');
-                /**************************************************************************************** */
+		switch($role = checkTokenData($token)){
+			case TOKEN_ADMIN:{
+				/* Admin authorized  */
 
-                break;
-            }
-            case TOKEN_ERROR:{
-                return $response = standardResponse($response, 400, true, 'Token invalid'); 
-            }
-        }
-    });
+				/* no args          - all users, all data*************************************************** */
+				if(count($params) == 0 ){
+					$db = new DbOperation;
+					$result = $db->getAllUsers($ret);
 
-    /*
-        endpoint: user
-        parameters: user/email/... ;  user/user_id/...
-        method: DELETE
-    */
-    $app->delete('/user[/{params:.*}]', function(Request $request, Response $response, $args){
-        $token = $request->getAttribute("decoded_token_data");
-        if (checkTokenData($token) == TOKEN_ADMIN) {
-            /* Admin authorized  */
-            $params = array_filter(explode('/', $args['params']));
+					if($result == GET_USERS_SUCCESS){
+						return $response = standardResponse($response, 200, false, 'Get users successfull', $ret);
+					}else if($result == GET_USERS_FAILURE){
+						return $response = standardResponse($response, 422, true, 'Some error occurred');
+					}else if($result == DB_ERROR){
+						return $response = standardResponse($response, 500, true, 'Database error');
+					}
+				}
+				/****************************************************************************************** */
+			}
+			case TOKEN_EMPLOYEE:{
 
-            if(count($params) != 2)
-                return $response = standardResponse($response, 400, true, 'Bad Request');
+				/* /user/id/[0-9]   -one user, short data************************************************** */
+				if(count($params) == 2 && $params[0] == 'id'){
+					$request_id = intval($params[1]);
+					if($token['id'] == $request_id || $role == TOKEN_ADMIN) //admin can get any user
+					{
+						$db = new DbOperation;
+						$result = $db->getUserShort($request_id, $ret);
 
-            switch($params[0]){
-                case "email": {
-                        $email = $params[1];
-                        if(isValidEmail($email)){
-                            $db = new DbOperation;
-                            $result = $db->deleteUsersByEmail($email);
-                        }else{
-                            return $response = standardResponse($response, 422, true, 'Invalid email');
-                        }
-                    break;
-                }
-                case "id": {
-                        $id = intval($params[1]);
-                        if($id > 0){
-                            $db = new DbOperation;
-                            $result = $db->deleteUsersById($id);
-                        }else{
-                            return $response = standardResponse($response, 422, true, 'Wrong ID');
-                        }
-                    break;
-                }
-                default: {
-                    return $response = standardResponse($response, 400, true, 'Bad Request');
-                }
-            }
+						if($result == GET_USERS_SUCCESS){
+							return $response = standardResponse($response, 200, false, 'Get user successfull', $ret);
+						}else if($result == GET_USERS_FAILURE){
+							return $response = standardResponse($response, 422, true, 'Some error occurred');
+						}else if($result == GET_USERS_NOT_FOUND){
+							return $response = standardResponse($response, 422, true, 'User not found');
+						}else if($result == DB_ERROR){
+							return $response = standardResponse($response, 500, true, 'Database error');
+						}
+					}
+				}
+				return $response = standardResponse($response, 400, true, 'Bad Request');
+				/**************************************************************************************** */
 
-            if($result == DELETE_USER_SUCCESS){
-                return $response = standardResponse($response, 200, false, 'User has been deleted', $ret); 
-            }else if($result == DELETE_USER_FAILURE){
-                return $response = standardResponse($response, 422, true, 'Some error occurred');    
-            }else if($result == USER_NOT_FOUND){
-                return $response = standardResponse($response, 422, true, 'User not found');      
-            }else if($result == DB_ERROR){
-                return $response = standardResponse($response, 500, true, 'Database error');  
-            }
-            return $response;
-        }else{
-            /* No scope so respond with 401 Unauthorized */
-            return $response = standardResponse($response, 401, true, 'No admin privileges'); 
-        }
-    });
+				break;
+			}
+			case TOKEN_ERROR:{
+				return $response = standardResponse($response, 400, true, 'Token invalid');
+			}
+		}
+	});
 
-    /*
-        endpoint: timesheet
-        parameters: timesheet/user_id/...
-        method: GET
-    */
-    $app->get('/timesheet[/{params:.*}]', function(Request $request, Response $response, $args){
-        //get arguments
-        $token = $request->getAttribute("decoded_token_data");
-        $params = array_filter(explode('/', $args['params']));
+	/*
+		endpoint: user
+		parameters: user/email/... ;  user/user_id/...
+		method: DELETE
+	*/
+	$app->delete('/user[/{params:.*}]', function(Request $request, Response $response, $args){
+		$token = $request->getAttribute("decoded_token_data");
+		if (checkTokenData($token) == TOKEN_ADMIN) {
+			/* Admin authorized  */
+			$params = array_filter(explode('/', $args['params']));
 
-        switch($role = checkTokenData($token)){
-            case TOKEN_ADMIN:{
-                /* Admin authorized  */
-              
-                /* no args        - all users, all timesheets*************************************************** */
-                if(count($params) == 0 ){
-                    $db = new DbOperation;
-                    $result = $db->getTimesheet($ret);
+			if(count($params) != 2)
+				return $response = standardResponse($response, 400, true, 'Bad Request');
 
-                    if($result == GET_TIMESHEET_SUCCESS){
-                        return $response = standardResponse($response, 200, false, 'Get timesheet successfull', $ret); 
-                    }else if($result == GET_TIMESHEET_FAILURE){
-                        return $response = standardResponse($response, 422, true, 'Some error occurred');         
-                    }else if($result == DB_ERROR){
-                        return $response = standardResponse($response, 500, true, 'Database error');  
-                    }
-                }
-                /****************************************************************************************** */ 
-            }
-            case TOKEN_EMPLOYEE:{
+			switch($params[0]){
+				case "email": {
+						$email = $params[1];
+						if(isValidEmail($email)){
+							$db = new DbOperation;
+							$result = $db->deleteUsersByEmail($email);
+						}else{
+							return $response = standardResponse($response, 422, true, 'Invalid email');
+						}
+					break;
+				}
+				case "id": {
+						$id = intval($params[1]);
+						if($id > 0){
+							$db = new DbOperation;
+							$result = $db->deleteUsersById($id);
+						}else{
+							return $response = standardResponse($response, 422, true, 'Wrong ID');
+						}
+					break;
+				}
+				default: {
+					return $response = standardResponse($response, 400, true, 'Bad Request');
+				}
+			}
 
-                /* /timesheet/id/[0-9]   -one user, all data************************************************** */
-                if(count($params) == 2 && $params[0] == 'id'){
-                    $request_id = intval($params[1]);
-                    if($token['id'] == $request_id || $role == TOKEN_ADMIN) //admin can get any user
-                    {
-                        $db = new DbOperation;
-                        $result = $db->getTimesheetByUser($request_id, $ret);
-                        
-                        if($result == GET_TIMESHEET_SUCCESS){
-                            return $response = standardResponse($response, 200, false, 'Get timesheet successfull', $ret); 
-                        }else if($result == GET_TIMESHEET_FAILURE){
-                            return $response = standardResponse($response, 422, true, 'Some error occurred');     
-                        }else if($result == DB_ERROR){
-                            return $response = standardResponse($response, 500, true, 'Database error');  
-                        }
-                    }
-                }
-                return $response = standardResponse($response, 400, true, 'Bad Request');
-                /**************************************************************************************** */
+			if($result == DELETE_USER_SUCCESS){
+				return $response = standardResponse($response, 200, false, 'User has been deleted', $ret);
+			}else if($result == DELETE_USER_FAILURE){
+				return $response = standardResponse($response, 422, true, 'Some error occurred');
+			}else if($result == USER_NOT_FOUND){
+				return $response = standardResponse($response, 422, true, 'User not found');
+			}else if($result == DB_ERROR){
+				return $response = standardResponse($response, 500, true, 'Database error');
+			}
+			return $response;
+		}else{
+			/* No scope so respond with 401 Unauthorized */
+			return $response = standardResponse($response, 401, true, 'No admin privileges');
+		}
+	});
 
-                break;
-            }
-            case TOKEN_ERROR:{
-                return $response = standardResponse($response, 400, true, 'Token invalid'); 
-            }
-        }
-    });
+	/*
+		endpoint: timesheet
+		parameters: timesheet/user_id/...
+		method: GET
+	*/
+	$app->get('/timesheet[/{params:.*}]', function(Request $request, Response $response, $args){
+		//get arguments
+		$token = $request->getAttribute("decoded_token_data");
+		$params = array_filter(explode('/', $args['params']));
 
-    /*
-        endpoint: timesheet
-        parameters: user_id, data, from, to, customer_break, statutory_break, comments, project_id, comapny_id, status, created_at, updated_at
-        method: POST
-    */
+		switch($role = checkTokenData($token)){
+			case TOKEN_ADMIN:{
+				/* Admin authorized  */
 
-    $app->post('/timesheet', function(Request $request, Response $response){
-        $token = $request->getAttribute("decoded_token_data");
-        if (checkTokenData($token) == TOKEN_ADMIN || checkTokenData($token) == TOKEN_EMPLOYEE){
-            if(!haveEmptyParameters(array( 
-                'user_id',
-                'date', 
-                'from', 
-                'to', 
-                'customer_break', 
-                'statutory_break', 
-                //'comments',
-                'project_id', 
-                'company_id', 
-                'status', 
-                'created_at', 
-                'updated_at'
-                ), $request, $response)){
+				/* no args        - all users, all timesheets*************************************************** */
+				if(count($params) == 0 ){
+					$db = new DbOperation;
+					$result = $db->getTimesheet($ret);
 
-                if(checkTokenData($token) == TOKEN_EMPLOYEE && $token['id'] != $request_data['user_id'])
-                    return $response = standardResponse($response, 401, true, 'Only admin can add timesheet row of other user'); 
+					if($result == GET_TIMESHEET_SUCCESS){
+						return $response = standardResponse($response, 200, false, 'Get timesheet successfull', $ret);
+					}else if($result == GET_TIMESHEET_FAILURE){
+						return $response = standardResponse($response, 422, true, 'Some error occurred');
+					}else if($result == DB_ERROR){
+						return $response = standardResponse($response, 500, true, 'Database error');
+					}
+				}
+				/****************************************************************************************** */
+			}
+			case TOKEN_EMPLOYEE:{
 
-                $request_data = $request->getParsedBody(); 
-                $db = new DbOperation; 
-                $result = $db->createTimesheetRow(
-                    $token['id'], 
-                    $request_data['date'], 
-                    $request_data['from'], 
-                    $request_data['to'], 
-                    $request_data['customer_break'], 
-                    $request_data['statutory_break'], 
-                    $request_data['comments'], 
-                    $request_data['project_id'], 
-                    $request_data['company_id'], 
-                    $request_data['status'],
-                    $request_data['created_at'],
-                    $request_data['updated_at'],
-                    $ret
-                );
-                
-                if($result == INSERT_TIMESHEETROW_SUCCESS){
-                    return $response = standardResponse($response, 201, false, 'TimesheetRow inserted', $ret); 
-                }else if($result == INSERT_TIMESHEETROW_FAILURE){
-                    return $response = standardResponse($response, 422, true, 'Some error occurred');        
-                }else if($result == DB_ERROR){
-                    return $response = standardResponse($response, 500, true, 'Database error');  
-                }
-            }else{
-                return $response;  
-            }
-        } else {
-            return $response = standardResponse($response, 401, true, 'No privileges'); 
-        }
-    });
+				/* /timesheet/id/[0-9]   -one user, all data************************************************** */
+				if(count($params) == 2 && $params[0] == 'id'){
+					$request_id = intval($params[1]);
+					if($token['id'] == $request_id || $role == TOKEN_ADMIN) //admin can get any user
+					{
+						$db = new DbOperation;
+						$result = $db->getTimesheetByUser($request_id, $ret);
 
-        /*
-        endpoint: timesheet
-        parameters: timesheet/id/...
-        method: DELETE
-    */
-    $app->delete('/timesheet/id/{id}', function(Request $request, Response $response, $args){
+						if($result == GET_TIMESHEET_SUCCESS){
+							return $response = standardResponse($response, 200, false, 'Get timesheet successfull', $ret);
+						}else if($result == GET_TIMESHEET_FAILURE){
+							return $response = standardResponse($response, 422, true, 'Some error occurred');
+						}else if($result == DB_ERROR){
+							return $response = standardResponse($response, 500, true, 'Database error');
+						}
+					}
+				}
+				return $response = standardResponse($response, 400, true, 'Bad Request');
+				/**************************************************************************************** */
 
-        $token = $request->getAttribute("decoded_token_data");
+				break;
+			}
+			case TOKEN_ERROR:{
+				return $response = standardResponse($response, 400, true, 'Token invalid');
+			}
+		}
+	});
 
-        switch($role = checkTokenData($token)){
-            case TOKEN_EMPLOYEE:{
-                //employee can delete only rows with his user_ID
-                if(getTimesheetById($args['id'], $timesheet) == GET_TIMESHEET_FAILURE)
-                    return $response = standardResponse($response, 422, true, 'Some error occurred'); 
-            
-                if($timesheet['data_length'] == 1 && timesheet['data'][0]['user_id'] == $token['id']){
-                    $result = deleteTimeshetRowById($args['id']);
-                }
-                break;
-            }
-            case TOKEN_ADMIN:{
-                /* Admin authorized  */
-                //admin can delete any row
-                $result = deleteTimeshetRowById($args['id']);
+	/*
+		endpoint: timesheet
+		parameters: user_id, data, from, to, customer_break, statutory_break, comments, project_id, comapny_id, status, created_at, updated_at
+		method: POST
+	*/
 
+	$app->post('/timesheet', function(Request $request, Response $response){
+		$token = $request->getAttribute("decoded_token_data");
+		if (checkTokenData($token) == TOKEN_ADMIN || checkTokenData($token) == TOKEN_EMPLOYEE){
+			if(!haveEmptyParameters(array(
+				'user_id',
+				'date',
+				'from',
+				'to',
+				'customer_break',
+				'statutory_break',
+				//'comments',
+				'project_id',
+				'company_id',
+				'status',
+				'created_at',
+				'updated_at'
+				), $request, $response)){
 
-                break;
-            }
-        }
+				if(checkTokenData($token) == TOKEN_EMPLOYEE && $token['id'] != $request_data['user_id'])
+					return $response = standardResponse($response, 401, true, 'Only admin can add timesheet row of other user');
 
-        if($result == DELETE_TIMESHEET_SUCCESS){
-            return $response = standardResponse($response, 200, false, 'Timesheet row has been deleted'); 
-        }else if($result == DELETE_USER_FAILURE){
-            return $response = standardResponse($response, 422, true, 'Some error occurred');        
-        }else if($result == DB_ERROR){
-            return $response = standardResponse($response, 500, true, 'Database error');  
-        } else
-            return $response;
-    });
+				$request_data = $request->getParsedBody();
+				$db = new DbOperation;
+				$result = $db->createTimesheetRow(
+					$token['id'],
+					$request_data['date'],
+					$request_data['from'],
+					$request_data['to'],
+					$request_data['customer_break'],
+					$request_data['statutory_break'],
+					$request_data['comments'],
+					$request_data['project_id'],
+					$request_data['company_id'],
+					$request_data['status'],
+					$request_data['created_at'],
+					$request_data['updated_at'],
+					$ret
+				);
+
+				if($result == INSERT_TIMESHEETROW_SUCCESS){
+					return $response = standardResponse($response, 201, false, 'TimesheetRow inserted', $ret);
+				}else if($result == INSERT_TIMESHEETROW_FAILURE){
+					return $response = standardResponse($response, 422, true, 'Some error occurred');
+				}else if($result == DB_ERROR){
+					return $response = standardResponse($response, 500, true, 'Database error');
+				}
+			}else{
+				return $response;
+			}
+		} else {
+			return $response = standardResponse($response, 401, true, 'No privileges');
+		}
+	});
+
+		/*
+		endpoint: timesheet
+		parameters: timesheet/id/...
+		method: DELETE
+	*/
+	$app->delete('/timesheet/id/{id}', function(Request $request, Response $response, $args){
+
+		$token = $request->getAttribute("decoded_token_data");
+
+		switch($role = checkTokenData($token)){
+			case TOKEN_EMPLOYEE:{
+				//employee can delete only rows with his user_ID
+				if(getTimesheetById($args['id'], $timesheet) == GET_TIMESHEET_FAILURE)
+					return $response = standardResponse($response, 422, true, 'Some error occurred');
+
+				if($timesheet['data_length'] == 1 && timesheet['data'][0]['user_id'] == $token['id']){
+					$result = deleteTimesheetRowById($args['id']);
+				}
+				break;
+			}
+			case TOKEN_ADMIN:{
+				/* Admin authorized  */
+				//admin can delete any row
+				$result = deleteTimesheetRowById($args['id']);
+				break;
+			}
+		}
+
+		if($result == DELETE_TIMESHEET_SUCCESS){
+			return $response = standardResponse($response, 200, false, 'Timesheet row has been deleted');
+		}else if($result == DELETE_USER_FAILURE){
+			return $response = standardResponse($response, 422, true, 'Some error occurred');
+		}else if($result == DB_ERROR){
+			return $response = standardResponse($response, 500, true, 'Database error');
+		} else
+			return $response;
+	});
 });
 
 function haveEmptyParameters($required_params, Request $request, Response &$response){
-    $error = false; 
-    $error_params = '';
-    $request_params = $request->getParsedBody(); 
+	$error = false;
+	$error_params = '';
+	$request_params = $request->getParsedBody();
 
-    foreach($required_params as $param){
-        if(!isset($request_params[$param]) || strlen($request_params[$param])<=0){
-            $error = true; 
-            $error_params .= $param . ', ';
-        }
-    }
+	foreach($required_params as $param){
+		if(!isset($request_params[$param]) || strlen($request_params[$param])<=0){
+			$error = true;
+			$error_params .= $param . ', ';
+		}
+	}
 
-    if($error){
-        $text = 'Required parameters: ' . substr($error_params, 0, -2) . ' are missing';
-        $response = standardResponse($response, 422, true, $text);
-    }
+	if($error){
+		$text = 'Required parameters: ' . substr($error_params, 0, -2) . ' are missing';
+		$response = standardResponse($response, 422, true, $text);
+	}
 
-    return $error;
+	return $error;
 }
 
 function isValidEmail(&$email){
-    // Remove all illegal characters from email
-    $email_filtred = filter_var($email, FILTER_SANITIZE_EMAIL);
+	// Remove all illegal characters from email
+	$email_filtred = filter_var($email, FILTER_SANITIZE_EMAIL);
 
-    // Compare with orginal
-    if(strcmp($email, $email_filtred) != 0)
-        return false;
+	// Compare with orginal
+	if(strcmp($email, $email_filtred) != 0)
+		return false;
 
-    // Validate e-mail
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL))
-        return false;
-    
-    // In this point must be valid
-    return true;    
+	// Validate e-mail
+	if (!filter_var($email, FILTER_VALIDATE_EMAIL))
+		return false;
+
+	// In this point must be valid
+	return true;
 }
 
 $app->run();
