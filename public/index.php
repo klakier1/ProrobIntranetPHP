@@ -375,15 +375,15 @@ $app->group('/api', function(\Slim\App $app) {
 	$app->delete('/timesheet/id/{id}', function(Request $request, Response $response, $args){
 
 		$token = $request->getAttribute("decoded_token_data");
-
+		$db = new DbOperation;
+	
 		switch($role = checkTokenData($token)){
 			case TOKEN_EMPLOYEE:{
 				//employee can delete only rows with his user_ID
-				if(getTimesheetById($args['id'], $timesheet) == GET_TIMESHEET_FAILURE)
+				if($db->getTimesheetById($args['id'], $timesheet) == GET_TIMESHEET_FAILURE)
 					return $response = standardResponse($response, 422, true, 'Some error occurred');
 
 				if($timesheet['data_length'] == 1 && timesheet['data'][0]['user_id'] == $token['id']){
-					$db = new DbOperation;
 					$result = $db->deleteTimesheetRowById($args['id']);
 				}
 				break;
@@ -391,7 +391,6 @@ $app->group('/api', function(\Slim\App $app) {
 			case TOKEN_ADMIN:{
 				/* Admin authorized  */
 				//admin can delete any row
-				$db = new DbOperation;
 				$result = $db->deleteTimesheetRowById($args['id']);
 				break;
 			}
