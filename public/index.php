@@ -383,7 +383,7 @@ $app->group('/api', function(\Slim\App $app) {
 				if($db->getTimesheetById($args['id'], $timesheet) == GET_TIMESHEET_FAILURE)
 					return $response = standardResponse($response, 422, true, 'Some error occurred');
 
-				if($timesheet['data_length'] == 1 && timesheet['data'][0]['user_id'] == $token['id']){
+				if($timesheet['data_length'] == 1 && $timesheet['data'][0]['user_id'] == $token['id']){
 					$result = $db->deleteTimesheetRowById($args['id']);
 				}
 				break;
@@ -398,7 +398,7 @@ $app->group('/api', function(\Slim\App $app) {
 
 		if($result == DELETE_TIMESHEET_SUCCESS){
 			return $response = standardResponse($response, 200, false, 'Timesheet row has been deleted');
-		}else if($result == DELETE_USER_FAILURE){
+		}else if($result == DELETE_TIMESHEET_FAILURE){
 			return $response = standardResponse($response, 422, true, 'Some error occurred');
 		}else if($result == DB_ERROR){
 			return $response = standardResponse($response, 500, true, 'Database error');
