@@ -265,7 +265,7 @@ $app->group('/api', function(\Slim\App $app) {
                 /* no args        - all users, all timesheets*************************************************** */
                 if(count($params) == 0 ){
                     $db = new DbOperation;
-                    $result = $db->getTimesheetByUser($ret);
+                    $result = $db->getTimesheet($ret);
 
                     if($result == GET_TIMESHEET_SUCCESS){
                         return $response = standardResponse($response, 200, false, 'Get timesheet successfull', $ret); 

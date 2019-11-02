@@ -207,7 +207,6 @@
             }
         }
 
-
         //TIMESHEET OPERATIONS ******************************************
         public function getTimesheet(&$result){
             if($this->con == null)
