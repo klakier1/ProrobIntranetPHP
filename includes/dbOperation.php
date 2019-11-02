@@ -209,13 +209,35 @@
 
 
         //TIMESHEET OPERATIONS ******************************************
-        public function getTimesheet($id, &$result){
+        public function getTimesheetByUser($user_id, &$result){
             if($this->con == null)
                 return DB_ERROR;
 
             $query = $this->con->prepare(
                 'SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at
-                    FROM public.timesheets WHERE user_id = :id;',
+                    FROM public.timesheets WHERE user_id = :user_id;',
+                array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+            $query->bindValue(':user_id', $user_id, PDO::PARAM_STR);
+
+            if($query->execute()){
+                $result['data_length'] = $query->rowCount();
+                while($row = $query->fetch(PDO::FETCH_ASSOC)){
+                    $result['data'][] = $row;
+                }
+
+                return GET_TIMESHEET_SUCCESS;
+            }else{
+                return GET_TIMESHEET_FAILURE;
+            }
+        }
+
+        public function getTimesheetById($id, &$result){
+            if($this->con == null)
+                return DB_ERROR;
+
+            $query = $this->con->prepare(
+                'SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at
+                    FROM public.timesheets WHERE id = :id;',
                 array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
             $query->bindValue(':id', $id, PDO::PARAM_STR);
 
@@ -282,6 +304,19 @@
                 return INSERT_TIMESHEETROW_SUCCESS;
             }else{
                 return INSERT_TIMESHEETROW_FAILURE;
+            }
+        }
+
+        public function deleteTimeshetRowById($id){
+            if($this->con == null)
+                return DB_ERROR;
+            
+            $query = $this->con->prepare('DELETE FROM public.timesheets WHERE id = :id');
+            $query->bindValue(':id', $id, PDO::PARAM_STR);
+            if($query->execute()){
+                return DELETE_TIMESHEETROW_SUCCESS;
+            }else{
+                return DELETE_TIMESHEETROW_FAILURE;
             }
         }
     }

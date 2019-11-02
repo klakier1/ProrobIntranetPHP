@@ -265,13 +265,12 @@ $app->group('/api', function(\Slim\App $app) {
                 /* no args        - all users, all timesheets*************************************************** */
                 if(count($params) == 0 ){
                     $db = new DbOperation;
-                    //TODO
-                    $result = GET_TIMESHEET_FAILURE;
+                    $result = $db->getTimesheetByUser('*', $ret);
 
                     if($result == GET_TIMESHEET_SUCCESS){
                         return $response = standardResponse($response, 200, false, 'Get timesheet successfull', $ret); 
                     }else if($result == GET_TIMESHEET_FAILURE){
-                        return $response = standardResponse($response, 422, true, 'Some error occurred, TODO');         
+                        return $response = standardResponse($response, 422, true, 'Some error occurred');         
                     }else if($result == DB_ERROR){
                         return $response = standardResponse($response, 500, true, 'Database error');  
                     }
@@ -286,7 +285,7 @@ $app->group('/api', function(\Slim\App $app) {
                     if($token['id'] == $request_id || $role == TOKEN_ADMIN) //admin can get any user
                     {
                         $db = new DbOperation;
-                        $result = $db->getTimesheet($request_id, $ret);
+                        $result = $db->getTimesheetByUser($request_id, $ret);
                         
                         if($result == GET_TIMESHEET_SUCCESS){
                             return $response = standardResponse($response, 200, false, 'Get timesheet successfull', $ret); 
@@ -366,6 +365,46 @@ $app->group('/api', function(\Slim\App $app) {
         } else {
             return $response = standardResponse($response, 401, true, 'No privileges'); 
         }
+    });
+
+        /*
+        endpoint: timesheet
+        parameters: timesheet/id/...
+        method: DELETE
+    */
+    $app->delete('/timesheet/id/{id}]', function(Request $request, Response $response, $args){
+
+        $token = $request->getAttribute("decoded_token_data");
+
+        switch($role = checkTokenData($token)){
+            case TOKEN_EMPLOYEE:{
+                //employee can delete only rows with his user_ID
+                if(getTimesheetById($args['id'], $timesheet) == GET_TIMESHEET_FAILURE)
+                    return $response = standardResponse($response, 422, true, 'Some error occurred'); 
+            
+                if($timesheet['data_length'] == 1 && timesheet['data'][0]['user_id'] == $token['id']){
+                    $result = deleteTimeshetRowById($args['id']);
+                }
+                break;
+            }
+            case TOKEN_ADMIN:{
+                /* Admin authorized  */
+                //admin can delete any row
+                $result = deleteTimeshetRowById($args['id']);
+
+
+                break;
+            }
+        }
+
+        if($result == DELETE_TIMESHEET_SUCCESS){
+            return $response = standardResponse($response, 200, false, 'Timesheet row has been deleted'); 
+        }else if($result == DELETE_USER_FAILURE){
+            return $response = standardResponse($response, 422, true, 'Some error occurred');        
+        }else if($result == DB_ERROR){
+            return $response = standardResponse($response, 500, true, 'Database error');  
+        } else
+            return $response;
     });
 });
 
