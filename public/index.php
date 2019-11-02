@@ -383,14 +383,16 @@ $app->group('/api', function(\Slim\App $app) {
 					return $response = standardResponse($response, 422, true, 'Some error occurred');
 
 				if($timesheet['data_length'] == 1 && timesheet['data'][0]['user_id'] == $token['id']){
-					$result = deleteTimesheetRowById($args['id']);
+					$db = new DbOperation;
+					$result = $db->deleteTimesheetRowById($args['id']);
 				}
 				break;
 			}
 			case TOKEN_ADMIN:{
 				/* Admin authorized  */
 				//admin can delete any row
-				$result = deleteTimesheetRowById($args['id']);
+				$db = new DbOperation;
+				$result = $db->deleteTimesheetRowById($args['id']);
 				break;
 			}
 		}
