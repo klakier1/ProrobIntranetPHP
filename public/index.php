@@ -383,6 +383,7 @@ $app->group('/api', function(\Slim\App $app) {
 				if($db->getTimesheetById($args['id'], $timesheet) == GET_TIMESHEET_FAILURE)
 					return $response = standardResponse($response, 422, true, 'Some error occurred');
 
+					var_dump($timesheet);
 				if($timesheet['data_length'] == 1 && $timesheet['data'][0]['user_id'] == $token['id']){
 					$result = $db->deleteTimesheetRowById($args['id']);
 				}
