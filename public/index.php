@@ -372,7 +372,7 @@ $app->group('/api', function(\Slim\App $app) {
         parameters: timesheet/id/...
         method: DELETE
     */
-    $app->delete('/timesheet/id/{id}]', function(Request $request, Response $response, $args){
+    $app->delete('/timesheet/id/{id}', function(Request $request, Response $response, $args){
 
         $token = $request->getAttribute("decoded_token_data");
 
