@@ -399,9 +399,9 @@ $app->group('/api', function(\Slim\App $app) {
 			}
 		}
 
-		if($result == DELETE_TIMESHEET_SUCCESS){
+		if($result == DELETE_TIMESHEETROW_SUCCESS){
 			return $response = standardResponse($response, 200, false, 'Timesheet row has been deleted');
-		}else if($result == DELETE_TIMESHEET_FAILURE){
+		}else if($result == DELETE_TIMESHEETROW_FAILURE){
 			return $response = standardResponse($response, 422, true, 'Some error occurred');
 		}else if($result == DB_ERROR){
 			return $response = standardResponse($response, 500, true, 'Database error');
