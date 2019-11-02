@@ -209,6 +209,27 @@
 
 
         //TIMESHEET OPERATIONS ******************************************
+        public function getTimesheet(&$result){
+            if($this->con == null)
+                return DB_ERROR;
+
+            $query = $this->con->prepare(
+                'SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at
+                    FROM public.timesheets',
+                array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+
+            if($query->execute()){
+                $result['data_length'] = $query->rowCount();
+                while($row = $query->fetch(PDO::FETCH_ASSOC)){
+                    $result['data'][] = $row;
+                }
+
+                return GET_TIMESHEET_SUCCESS;
+            }else{
+                return GET_TIMESHEET_FAILURE;
+            }
+        }
+
         public function getTimesheetByUser($user_id, &$result){
             if($this->con == null)
                 return DB_ERROR;
