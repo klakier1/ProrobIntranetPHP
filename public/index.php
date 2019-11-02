@@ -386,7 +386,8 @@ $app->group('/api', function(\Slim\App $app) {
 					var_dump($timesheet);
 				if($timesheet['data_length'] == 1 && $timesheet['data'][0]['user_id'] == $token['id']){
 					$result = $db->deleteTimesheetRowById($args['id']);
-				}
+				} else 
+					return $response = standardResponse($response, 422, true, 'Data mismatch');
 				break;
 			}
 			case TOKEN_ADMIN:{
