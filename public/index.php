@@ -376,15 +376,17 @@ $app->group('/api', function(\Slim\App $app) {
 
 		$token = $request->getAttribute("decoded_token_data");
 		$db = new DbOperation;
-	
+		
+		//check if timesheet row exist
+		if($db->getTimesheetById($args['id'], $timesheet) == GET_TIMESHEET_FAILURE)
+			return $response = standardResponse($response, 422, true, 'Some error occurred');				
+		if($timesheet['data_length'] == 0)
+			return $response = standardResponse($response, 422, true, 'Time sheet not exist');	
+
 		switch($role = checkTokenData($token)){
 			case TOKEN_EMPLOYEE:{
-				//employee can delete only rows with his user_ID
-				if($db->getTimesheetById($args['id'], $timesheet) == GET_TIMESHEET_FAILURE)
-					return $response = standardResponse($response, 422, true, 'Some error occurred');
-
-					
-					echo "\n".$timesheet['data_length']. "      ".$timesheet['data'][0]['user_id']."     ".$token['id'];
+				
+				//user can delete only his row
 				if($timesheet['data_length'] == 1 && $timesheet['data'][0]['user_id'] == $token['id']){
 					$result = $db->deleteTimesheetRowById($args['id']);
 				} else 
