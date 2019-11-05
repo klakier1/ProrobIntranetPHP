@@ -280,7 +280,7 @@ $app->group('/api', function(\Slim\App $app) {
 			case TOKEN_EMPLOYEE:{
 
 				/* /timesheet/id/[0-9]   -one user, all data************************************************** */
-				if(count($params) == 2 && $params[0] == 'id'){
+				if(count($params) == 2 && $params[0] == 'user_id'){
 					$request_id = intval($params[1]);
 					if($token['id'] == $request_id || $role == TOKEN_ADMIN) //admin can get any user
 					{
