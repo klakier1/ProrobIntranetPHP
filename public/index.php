@@ -367,7 +367,7 @@ $app->group('/api', function(\Slim\App $app) {
 		}
 	});
 
-		/*
+	/*
 		endpoint: timesheet
 		parameters: timesheet/id/...
 		method: DELETE
@@ -409,6 +409,69 @@ $app->group('/api', function(\Slim\App $app) {
 			return $response = standardResponse($response, 500, true, 'Database error');
 		} else
 			return $response;
+	});
+
+	/*
+		endpoint: countries
+		parameters: countries
+		method: GET
+	*/
+	$app->get('/countries', function(Request $request, Response $response, $args){
+		//get arguments
+		$token = $request->getAttribute("decoded_token_data");
+
+		switch($role = checkTokenData($token)){
+			case TOKEN_ADMIN:
+			case TOKEN_EMPLOYEE:{
+
+				$db = new DbOperation;
+				$result = $db->getCountries($ret);
+
+				if($result == GET_COUNTRIES_SUCCESS){
+					return $response = standardResponse($response, 200, false, 'Get countries successfull', $ret);
+				}else if($result == GET_COUNTRIES_FAILURE){
+					return $response = standardResponse($response, 422, true, 'Some error occurred');
+				}else if($result == DB_ERROR){
+					return $response = standardResponse($response, 500, true, 'Database error');
+				}
+				break;
+			}
+			case TOKEN_ERROR:{
+				return $response = standardResponse($response, 400, true, 'Token invalid');
+			}
+		}
+	});
+
+		/*
+		endpoint: objectives
+		parameters: objectives
+		method: GET
+	*/
+	$app->get('/objectives', function(Request $request, Response $response, $args){
+		$token = $request->getAttribute("decoded_token_data");
+
+		switch($role = checkTokenData($token)){
+			case TOKEN_ADMIN:
+			case TOKEN_EMPLOYEE:{
+
+				$db = new DbOperation;
+				$result = $db->getCountries($ret);
+				
+				
+
+				if($result == GET_COUNTRIES_SUCCESS){
+					return $response = standardResponse($response, 200, false, 'Get countries successfull', $ret);
+				}else if($result == GET_COUNTRIES_FAILURE){
+					return $response = standardResponse($response, 422, true, 'Some error occurred');
+				}else if($result == DB_ERROR){
+					return $response = standardResponse($response, 500, true, 'Database error');
+				}
+				break;
+			}
+			case TOKEN_ERROR:{
+				return $response = standardResponse($response, 400, true, 'Token invalid');
+			}
+		}
 	});
 });
 

@@ -339,5 +339,27 @@
                 return DELETE_TIMESHEETROW_FAILURE;
             }
         }
+
+        // COUNTRY OPERATIONS *************************************************************
+        public function getCountries(&$result){
+            if($this->con == null)
+                return DB_ERROR;
+
+            $query = $this->con->prepare(
+                'SELECT id, name, currency, cash_per_day, hotel_cash_per_day, created_at, updated_at, objectives
+                FROM public.countries;',
+                array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+
+            if($query->execute()){
+                $result['data_length'] = $query->rowCount();
+                while($row = $query->fetch(PDO::FETCH_ASSOC)){
+                    $result['data'][] = $row;
+                }
+
+                return GET_COUNTRIES_SUCCESS;
+            }else{
+                return GET_COUNTRIES_FAILURE;
+            }
+        }
     }
 ?>
