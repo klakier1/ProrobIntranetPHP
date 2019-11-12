@@ -463,7 +463,7 @@ $app->group('/api', function(\Slim\App $app) {
 				}
 
 				if($result == GET_COUNTRIES_SUCCESS){
-					return $response = standardResponse($response, 200, false, 'Get countries successfull', $ret);
+					return $response = standardResponse($response, 200, false, 'Get objectives successfull', $ret);
 				}else if($result == GET_COUNTRIES_FAILURE){
 					return $response = standardResponse($response, 422, true, 'Some error occurred');
 				}else if($result == DB_ERROR){
