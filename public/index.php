@@ -455,12 +455,18 @@ $app->group('/api', function(\Slim\App $app) {
 			case TOKEN_EMPLOYEE:{
 
 				$db = new DbOperation;
-				$result = $db->getCountries($ret);
-				
-				foreach($ret['data'] as $country)
-				{
-					echo $country['objectives']. "\n";
+				$result = $db->getCountries($retCountries);
+				$splitedObj = array();
+
+				foreach($retCountries['data'] as $country){
+					//echo $country['objectives']. "\n";
+					if($country['objectives'] == null){
+						array_merge($splitedObj,explode("\n",$country['objectives']));
+					}
 				}
+
+				$ret['data_length'] = $splitedObj.count();
+				$ret['data'] = $splitedObj;
 
 				if($result == GET_COUNTRIES_SUCCESS){
 					return $response = standardResponse($response, 200, false, 'Get objectives successfull', $ret);
