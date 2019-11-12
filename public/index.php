@@ -457,7 +457,10 @@ $app->group('/api', function(\Slim\App $app) {
 				$db = new DbOperation;
 				$result = $db->getCountries($ret);
 				
-				
+				foreach($result as $counrty)
+				{
+					echo $counrty['objectives']. "\n";
+				}
 
 				if($result == GET_COUNTRIES_SUCCESS){
 					return $response = standardResponse($response, 200, false, 'Get countries successfull', $ret);
