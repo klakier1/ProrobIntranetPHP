@@ -459,13 +459,17 @@ $app->group('/api', function(\Slim\App $app) {
 				$splitedObj = array();
 
 				foreach($retCountries['data'] as $country){
-					//echo $country['objectives']. "\n";
-					if($country['objectives'] == null){
-						array_merge($splitedObj,explode("\n",$country['objectives']));
+					if($country['objectives'] != null){
+						$rawObjectives = explode("\n",$country['objectives']);
+						foreach($rawObjectives as $rawObjective){
+							if(!($rawObjective == "" || $rawObjective == "---")){
+								array_push($splitedObj, ltrim($rawObjective,"- "));
+							}
+						}
 					}
 				}
 
-				$ret['data_length'] = $splitedObj.count();
+				$ret['data_length'] = count($splitedObj);
 				$ret['data'] = $splitedObj;
 
 				if($result == GET_COUNTRIES_SUCCESS){
