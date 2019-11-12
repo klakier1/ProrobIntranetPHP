@@ -457,9 +457,9 @@ $app->group('/api', function(\Slim\App $app) {
 				$db = new DbOperation;
 				$result = $db->getCountries($ret);
 				
-				foreach($result as $counrty)
+				foreach($result as $country)
 				{
-					echo $counrty['objectives']. "\n";
+					echo $country['objectives']. "\n";
 				}
 
 				if($result == GET_COUNTRIES_SUCCESS){
