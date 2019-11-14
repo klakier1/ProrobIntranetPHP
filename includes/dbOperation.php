@@ -7,6 +7,8 @@
         function __construct(){
             require_once dirname(__FILE__) . '/dbConnect.php';
             $db = new DbConnect();
+            if($db == null)
+                throw new Exception("Can't connect with database");
             $this->con = $db->connect();
         }
         

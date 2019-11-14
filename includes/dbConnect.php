@@ -26,7 +26,7 @@
             } 
             catch(PDOException $e)
             {
-                echo "Failed to connect " . $e->getCode();
+                echo "Failed to connect " . $e->getCode() . " " . $e->getMessage();
                 return null;
             }
 
