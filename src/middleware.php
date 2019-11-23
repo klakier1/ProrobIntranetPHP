@@ -1,7 +1,7 @@
 <?php
 
 use Slim\App;
-
+//$app->add(new \Klakier\Middleware\MyMiddleware());
 $app->add(new \Tuupola\Middleware\JwtAuthentication([
         "secure" => false,
         "path" => "/api", /* or ["/api", "/admin"] */
@@ -12,5 +12,8 @@ $app->add(new \Tuupola\Middleware\JwtAuthentication([
             return $response = standardResponse($response, 401, true, $arguments["message"]);
         }
 ]));
+
+
+
 
 

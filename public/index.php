@@ -17,6 +17,7 @@ require '../vendor/autoload.php';
 require '../includes/responseProcess.php';
 require '../includes/dbOperation.php';
 require '../includes/token.php';
+require '../includes/MyMiddleware.php';
 
 $app = new \Slim\App([
 	'settings'=>[
