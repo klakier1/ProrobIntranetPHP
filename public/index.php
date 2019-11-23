@@ -412,6 +412,31 @@ $app->group('/api', function(\Slim\App $app) {
 	});
 
 	/*
+		endpoint: timesheet
+		parameters: timesheet
+		method: PUT
+	*/
+	$app->put('/timesheet', function(Request $request, Response $response, $args){
+		if(!haveIllegalParameters(array(
+			'date',
+			'from',
+			'to',
+			'customer_break',
+			'statutory_break',
+			'comments',
+			'project_id',
+			'company_id',
+			//'status',
+			//'created_at',
+			'updated_at'
+			), $request, $response)){
+			return $response = standardResponse($response, 200, false, "Alles klar");		
+		} else {
+			return $response;
+		}
+	});
+
+	/*
 		endpoint: countries
 		parameters: countries
 		method: GET
@@ -442,7 +467,7 @@ $app->group('/api', function(\Slim\App $app) {
 		}
 	});
 
-		/*
+	/*
 		endpoint: objectives
 		parameters: objectives
 		method: GET
@@ -502,6 +527,25 @@ function haveEmptyParameters($required_params, Request $request, Response &$resp
 
 	if($error){
 		$text = 'Required parameters: ' . substr($error_params, 0, -2) . ' are missing';
+		$response = standardResponse($response, 422, true, $text);
+	}
+
+	return $error;
+}
+
+function haveIllegalParameters($allowed_params, Request $request, Response &$response){
+	$error = false;
+	$error_params = '';
+	$request_params = $request->getParsedBody();
+
+	foreach(array_keys($request_params) as $param){
+		if(!in_array($param, $allowed_params, true))
+			$error = true;
+			$error_params .= $param . ', ';
+	}
+
+	if($error){
+		$text = 'Illegal parameters: ' . substr($error_params, 0, -2);
 		$response = standardResponse($response, 422, true, $text);
 	}
 
