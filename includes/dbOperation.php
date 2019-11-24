@@ -112,7 +112,7 @@
             return count($result);
         }
 
-        private function isIdExist($id){
+        private function isIdExist($id): int{
             $query = $this->con->prepare('SELECT id FROM public.users WHERE id = :id');
             $query->bindValue(':id', $id, PDO::PARAM_STR);
             $query->execute();
@@ -196,7 +196,7 @@
             if($this->con == null)
                 return DB_ERROR;
             
-            if($this->isIdExist($id)){
+            if($this->isIdExist($id) > 0){
                 $query = $this->con->prepare('DELETE FROM public.users WHERE id = :id');
                 $query->bindValue(':id', $id, PDO::PARAM_STR);
                 if($query->execute()){
@@ -342,6 +342,38 @@
             }
         }
 
+        public function updateTimesheetRowById(int $id, iterable $params): int{
+            if($this->con == null)
+            return DB_ERROR;
+
+            if($this->isTimesheetExist($id)){
+                //$query = $this->con->prepare('DELETE FROM public.users WHERE email = :email');
+                //$query->bindValue(':email', $email, PDO::PARAM_STR);
+                //$query = createUpdateQuery('public.timesheets' ,$params, array('id' => $id));
+                $sql = $this->createUpdateQuery('public.timesheets' ,$params, array('id' => $id));
+                $query = $this->con->prepare($sql);
+                try{
+                    if($query->execute()){
+                        return UPDATE_TIMESHEETROW_SUCCESS;
+                    }else{
+                        return UPDATE_TIMESHEETROW_FAILURE;
+                    }
+                }catch(Exception $e){
+                    return UPDATE_TIMESHEETROW_FAILURE;
+                }
+            }else{
+                return TIMESHEET_NOT_FOUND;
+            }
+        }
+
+        private function isTimesheetExist($id): int{
+            $query = $this->con->prepare('SELECT id FROM public.timesheets WHERE id = :id');
+            $query->bindValue(':id', $id, PDO::PARAM_STR);
+            $query->execute();
+            $result = $query->fetchAll();
+            return count($result);
+        }
+
         // COUNTRY OPERATIONS *************************************************************
         public function getCountries(&$result){
             if($this->con == null)
@@ -362,6 +394,24 @@
             }else{
                 return GET_COUNTRIES_FAILURE;
             }
+        }
+
+        // COMMON FUNCTIONS ***************************************************************
+        private function createUpdateQuery(string $tablename, array $params, array $id): string{
+            //UPDATE public.timesheets
+	        //SET id=?, user_id=?, date=?, "from"=?, "to"=?, customer_break=?, statutory_break=?, comments=?, project_id=?, company_id=?, status=?, created_at=?, updated_at=?, project=?
+            //WHERE <condition>;
+            $valueSets = array();
+            foreach($params as $key => $value) {
+                $valueSets[] = $key . " = '" . $value . "'";
+            }
+
+            $conditionSets = array();
+            foreach($id as $key => $value) {
+                $conditionSets[] = $key . " = '" . $value . "'";
+            }
+
+            return $sql = "UPDATE $tablename SET ". join(",",$valueSets) . " WHERE " . join(" AND ", $conditionSets);
         }
     }
 ?>

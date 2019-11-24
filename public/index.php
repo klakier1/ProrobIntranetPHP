@@ -334,10 +334,11 @@ $app->group('/api', function(\Slim\App $app) {
 				'updated_at'
 				), $request, $response)){
 
+				$request_data = $request->getParsedBody();
+
 				if(checkTokenData($token) == TOKEN_EMPLOYEE && $token['id'] != $request_data['user_id'])
 					return $response = standardResponse($response, 401, true, 'Only admin can add timesheet row of other user');
 
-				$request_data = $request->getParsedBody();
 				$db = new DbOperation;
 				$result = $db->createTimesheetRow(
 					$token['id'],
@@ -420,21 +421,75 @@ $app->group('/api', function(\Slim\App $app) {
 		method: PUT
 	*/
 	$app->put('/timesheet', function(Request $request, Response $response, $args){
-		if(!haveIllegalParameters(array(
-			'date',
-			'from',
-			'to',
-			'customer_break',
-			'statutory_break',
-			'comments',
-			'project_id',
-			'company_id',
-			//'status',
-			//'created_at',
-			'updated_at'
+		if(!haveEmptyParameters(array(
+			'id',
+		), $request, $response)){
+
+			if(!haveIllegalParameters(array(
+				'id',
+				'date',
+				'from',
+				'to',
+				'customer_break',
+				'statutory_break',
+				'comments',
+				'project_id',
+				'company_id',
+				//'status',
+				//'created_at',
+				'updated_at'
 			), $request, $response)){
-			return $response = standardResponse($response, 200, false, "Alles klar");		
-		} else {
+
+				$token = $request->getAttribute("decoded_token_data");
+				$request_data = $request->getParsedBody();
+
+				//copy params and unset id and user_id for creating update query
+				//id and user_id cannot be updated
+				$query_params = $request_data;
+				unset($query_params['id']);
+				if(count($query_params) == 0)
+					return $response = standardResponse($response, 422, true, 'Nothing to update');	
+
+				$db = new DbOperation;
+				
+				//check if timesheet row exist
+				if($db->getTimesheetById($request_data['id'], $timesheet) == GET_TIMESHEET_FAILURE)
+					return $response = standardResponse($response, 422, true, 'Some error occurred');				
+				if($timesheet['data_length'] == 0)
+					return $response = standardResponse($response, 422, true, 'Time sheet not exist');	
+
+				switch($role = checkTokenData($token)){
+					case TOKEN_EMPLOYEE:{
+						//user can update only his row
+						if($timesheet['data_length'] == 1 && $timesheet['data'][0]['user_id'] == $token['id']){
+							$result = $db->updateTimesheetRowById($request_data['id'], $query_params);
+						} else 
+							return $response = standardResponse($response, 422, true, 'User ID doesnt matach with token');
+						break;
+					}
+					case TOKEN_ADMIN:{
+						/* Admin authorized  */
+						//admin can update any row
+						$result = $db->updateTimesheetRowById($request_data['id'], $query_params);
+						break;
+					}
+					default:{
+						return $response = standardResponse($response, 401, true, 'No privileges');
+					}
+				}
+
+				if($result == UPDATE_TIMESHEETROW_SUCCESS)
+					return $response = standardResponse($response, 200, false, 'Timesheet row has been updated');
+				elseif($result == UPDATE_TIMESHEETROW_FAILURE){
+					return $response = standardResponse($response, 422, true, 'Some error occurred');
+				}else if($result == DB_ERROR){
+					return $response = standardResponse($response, 500, true, 'Database error');
+				} else
+					return $response;	
+				} else {
+					return $response;
+			}
+		}else {
 			return $response;
 		}
 	});
