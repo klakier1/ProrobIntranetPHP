@@ -522,13 +522,13 @@ $app->group('/api', function(\Slim\App $app) {
 		$log->addWarning("********************BODY*****************");
 		echo "********************BODY*****************\n";
 
-		$log->addDebug($request->getBody());
+		$log->addWarnig($request->getBody());
 		echo $request->getBody();
 
-		$log->addDebug("*******************PARSED BODY****************");
+		$log->addWarning("*******************PARSED BODY****************");
 		echo "*******************PARSED BODY****************";
 
-		$log->addDebug(var_dump($request->getParsedBody()));
+		$log->addWarning(var_dump($request->getParsedBody()));
 		echo var_dump($request->getParsedBody());
 	});
 });
