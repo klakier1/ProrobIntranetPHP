@@ -1,5 +1,8 @@
 <?php
 
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
     class DbOperation{
 
         private $con;
@@ -351,6 +354,10 @@
                 //$query->bindValue(':email', $email, PDO::PARAM_STR);
                 //$query = createUpdateQuery('public.timesheets' ,$params, array('id' => $id));
                 $sql = $this->createUpdateQuery('public.timesheets' ,$params, array('id' => $id));
+
+                $log = new Logger('KlakierDebug');
+                $log->addWarning($sql);
+
                 $query = $this->con->prepare($sql);
                 try{
                     if($query->execute()){

@@ -454,7 +454,7 @@ $app->group('/api', function(\Slim\App $app) {
 				
 				//check if timesheet row exist
 				if($db->getTimesheetById($request_data['id'], $timesheet) == GET_TIMESHEET_FAILURE)
-					return $response = standardResponse($response, 422, true, 'Some error occurred');				
+					return $response = standardResponse($response, 422, true, 'Some error occurred, get timesheet failed');				
 				if($timesheet['data_length'] == 0)
 					return $response = standardResponse($response, 422, true, 'Time sheet not exist');	
 
