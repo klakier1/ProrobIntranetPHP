@@ -366,6 +366,9 @@ use Monolog\Handler\StreamHandler;
                         return UPDATE_TIMESHEETROW_FAILURE;
                     }
                 }catch(Exception $e){
+
+                    $log->addWarning($e->getMessage());
+
                     return UPDATE_TIMESHEETROW_FAILURE;
                 }
             }else{
