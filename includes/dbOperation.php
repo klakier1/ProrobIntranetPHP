@@ -413,7 +413,7 @@ use Monolog\Handler\StreamHandler;
             //WHERE <condition>;
             $valueSets = array();
             foreach($params as $key => $value) {
-                $valueSets[] = $key . " = '" . $value . "'";
+                $valueSets[] = "\"" . $key . "\" = '" . $value . "'";
             }
 
             $conditionSets = array();
