@@ -516,10 +516,10 @@ $app->group('/api', function(\Slim\App $app) {
 	});
 
 	$app->map(['GET', 'POST', 'PUT', 'DELETE'], '/test', function (Request $request, Response $response, $args) {
-		$log = new Logger('name');
+		$log = new Logger('KlakierDebug');
 		$log->pushHandler(new StreamHandler('php://stderr', Logger::WARNING));
 		
-		$log->addDebug("********************BODY*****************");
+		$log->addWarning("********************BODY*****************");
 		echo "********************BODY*****************\n";
 
 		$log->addDebug($request->getBody());
