@@ -522,7 +522,7 @@ $app->group('/api', function(\Slim\App $app) {
 		$log->addWarning("********************BODY*****************");
 		echo "********************BODY*****************\n";
 
-		$log->addWarnig($request->getBody());
+		$log->addWarning($request->getBody());
 		echo $request->getBody();
 
 		$log->addWarning("*******************PARSED BODY****************");
