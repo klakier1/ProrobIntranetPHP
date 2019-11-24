@@ -13,6 +13,9 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use \Firebase\JWT\JWT;
 
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
 require '../vendor/autoload.php';
 require '../includes/responseProcess.php';
 require '../includes/dbOperation.php';
@@ -511,6 +514,23 @@ $app->group('/api', function(\Slim\App $app) {
 			}
 		}
 	});
+
+	$app->map(['GET', 'POST', 'PUT', 'DELETE'], '/test', function (Request $request, Response $response, $args) {
+		$log = new Logger('name');
+		$log->pushHandler(new StreamHandler('php://stderr', Logger::WARNING));
+		
+		$log->addDebug("********************BODY*****************");
+		echo "********************BODY*****************\n";
+
+		$log->addDebug($request->getBody());
+		echo $request->getBody();
+
+		$log->addDebug("*******************PARSED BODY****************");
+		echo "*******************PARSED BODY****************";
+
+		$log->addDebug(var_dump($request->getParsedBody()));
+		echo var_dump($request->getParsedBody());
+	});
 });
 
 function haveEmptyParameters($required_params, Request $request, Response &$response){
@@ -540,8 +560,10 @@ function haveIllegalParameters($allowed_params, Request $request, Response &$res
 
 	foreach(array_keys($request_params) as $param){
 		if(!in_array($param, $allowed_params, true))
+		{
 			$error = true;
 			$error_params .= $param . ', ';
+		}
 	}
 
 	if($error){
