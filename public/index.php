@@ -571,7 +571,7 @@ $app->group('/api', function(\Slim\App $app) {
 	});
 
 	$app->map(['GET', 'POST', 'PUT', 'DELETE'], '/test', function (Request $request, Response $response, $args) {
-		$log = new Logger('KlakierDebug');
+		$log = new Logger(DEBUG_TAG);
 		$log->pushHandler(new StreamHandler('php://stderr', Logger::WARNING));
 		
 		$log->addWarning("********************BODY*****************");

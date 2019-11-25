@@ -353,22 +353,30 @@ use Monolog\Handler\StreamHandler;
                 //$query = $this->con->prepare('DELETE FROM public.users WHERE email = :email');
                 //$query->bindValue(':email', $email, PDO::PARAM_STR);
                 //$query = createUpdateQuery('public.timesheets' ,$params, array('id' => $id));
+
+                $this->con->query("SET TIMEZONE TO 'CET';");
+                if(!isset($params['updated_at'])){
+                    //$now = new DateTime();
+                    //$params['updated_at'] = $now->format('Y-m-d H:i:s.u');
+                    $params['updated_at'] = "NOW()";
+                }
+
                 $sql = $this->createUpdateQuery('public.timesheets' ,$params, array('id' => $id));
 
-                $log = new Logger('KlakierDebug');
-                $log->addWarning($sql);
+
 
                 $query = $this->con->prepare($sql);
+                $params['id'] = $id;
+                
                 try{
-                    if($query->execute()){
+                    if($query->execute($params)){
                         return UPDATE_TIMESHEETROW_SUCCESS;
                     }else{
                         return UPDATE_TIMESHEETROW_FAILURE;
                     }
                 }catch(Exception $e){
-
+                    $log = new Logger(DEBUG_TAG);
                     $log->addWarning($e->getMessage());
-
                     return UPDATE_TIMESHEETROW_FAILURE;
                 }
             }else{
@@ -407,18 +415,18 @@ use Monolog\Handler\StreamHandler;
         }
 
         // COMMON FUNCTIONS ***************************************************************
-        private function createUpdateQuery(string $tablename, array $params, array $id): string{
+        private function createUpdateQuery(string $tablename, array $params, array $where): string{
             //UPDATE public.timesheets
 	        //SET id=?, user_id=?, date=?, "from"=?, "to"=?, customer_break=?, statutory_break=?, comments=?, project_id=?, company_id=?, status=?, created_at=?, updated_at=?, project=?
             //WHERE <condition>;
             $valueSets = array();
             foreach($params as $key => $value) {
-                $valueSets[] = "\"" . $key . "\" = '" . $value . "'";
+                $valueSets[] = "\"" . $key . "\" = :" . $key;
             }
 
             $conditionSets = array();
-            foreach($id as $key => $value) {
-                $conditionSets[] = $key . " = '" . $value . "'";
+            foreach($where as $key => $value) {
+                $conditionSets[] = "\"" . $key . "\" = :" . $key;
             }
 
             return $sql = "UPDATE $tablename SET ". join(",",$valueSets) . " WHERE " . join(" AND ", $conditionSets);

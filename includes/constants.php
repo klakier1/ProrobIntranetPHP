@@ -1,5 +1,6 @@
 <?php 
-
+    define('DEBUG_TAG','KlakierDebug');
+    
     define('TOKEN_ADMIN', "admin");
     define('TOKEN_EMPLOYEE', "employee");
     define('TOKEN_ERROR', "error");
