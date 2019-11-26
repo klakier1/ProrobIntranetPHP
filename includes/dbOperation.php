@@ -325,7 +325,7 @@ use Monolog\Handler\StreamHandler;
             $query->bindValue(':status', $status, PDO::PARAM_BOOL);
             $query->bindValue(':created_at', $created_at, PDO::PARAM_STR);
             $query->bindValue(':updated_at', $updated_at, PDO::PARAM_STR);
-            $query->bindValue(':project', $updated_at, PDO::PARAM_STR);
+            $query->bindValue(':project', $project, PDO::PARAM_STR);
 
             if($query->execute()){
                 $result['id'] = $this->con->lastInsertId('public.timesheets_id_seq');
