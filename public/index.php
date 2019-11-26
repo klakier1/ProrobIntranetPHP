@@ -331,7 +331,8 @@ $app->group('/api', function(\Slim\App $app) {
 				'company_id',
 				'status',
 				'created_at',
-				'updated_at'
+				'updated_at',
+				'project'
 				), $request, $response)){
 
 				$request_data = $request->getParsedBody();
@@ -353,6 +354,7 @@ $app->group('/api', function(\Slim\App $app) {
 					$request_data['status'],
 					$request_data['created_at'],
 					$request_data['updated_at'],
+					$request_data['project'],
 					$ret
 				);
 
@@ -437,7 +439,8 @@ $app->group('/api', function(\Slim\App $app) {
 				'company_id',
 				//'status',
 				//'created_at',
-				'updated_at'
+				'updated_at',
+				'project',
 			), $request, $response)){
 
 				$token = $request->getAttribute("decoded_token_data");

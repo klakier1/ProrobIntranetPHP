@@ -239,7 +239,7 @@ use Monolog\Handler\StreamHandler;
                 return DB_ERROR;
 
             $query = $this->con->prepare(
-                'SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at
+                'SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at, project
                     FROM public.timesheets WHERE user_id = :user_id;',
                 array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
             $query->bindValue(':user_id', $user_id, PDO::PARAM_STR);
@@ -261,7 +261,7 @@ use Monolog\Handler\StreamHandler;
                 return DB_ERROR;
 
             $query = $this->con->prepare(
-                'SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at
+                'SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at, project
                     FROM public.timesheets WHERE id = :id;',
                 array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
             $query->bindValue(':id', $id, PDO::PARAM_STR);
@@ -278,7 +278,7 @@ use Monolog\Handler\StreamHandler;
             }
         }
 
-        public function createTimesheetRow($user_id, $date, $from, $to, $customer_break, $statutory_break, $comments, $project_id, $company_id, $status, $created_at, $updated_at, &$result){
+        public function createTimesheetRow($user_id, $date, $from, $to, $customer_break, $statutory_break, $comments, $project_id, $company_id, $status, $created_at, $updated_at, $project, &$result){
             if($this->con == null)
                 return DB_ERROR;
             
@@ -295,7 +295,8 @@ use Monolog\Handler\StreamHandler;
                     company_id, 
                     status, 
                     created_at, 
-                    updated_at)
+                    updated_at,
+                    project)
                 VALUES ( 
                     :user_id, 
                     :date, 
@@ -308,7 +309,8 @@ use Monolog\Handler\StreamHandler;
                     :company_id, 
                     :status, 
                     :created_at, 
-                    :updated_at);"
+                    :updated_at,
+                    :project);"
             );
 
             $query->bindValue(':user_id', $user_id, PDO::PARAM_INT);
@@ -323,6 +325,7 @@ use Monolog\Handler\StreamHandler;
             $query->bindValue(':status', $status, PDO::PARAM_BOOL);
             $query->bindValue(':created_at', $created_at, PDO::PARAM_STR);
             $query->bindValue(':updated_at', $updated_at, PDO::PARAM_STR);
+            $query->bindValue(':project', $updated_at, PDO::PARAM_STR);
 
             if($query->execute()){
                 $result['id'] = $this->con->lastInsertId('public.timesheets_id_seq');
