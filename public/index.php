@@ -342,7 +342,7 @@ $app->group('/api', function(\Slim\App $app) {
 
 				$db = new DbOperation;
 				$result = $db->createTimesheetRow(
-					$request_data['id'],
+					$request_data['user_id'],
 					$request_data['date'],
 					$request_data['from'],
 					$request_data['to'],
