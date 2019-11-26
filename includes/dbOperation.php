@@ -218,7 +218,7 @@ use Monolog\Handler\StreamHandler;
                 return DB_ERROR;
 
             $query = $this->con->prepare(
-                'SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at
+                'SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at, project
                     FROM public.timesheets',
                 array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 
