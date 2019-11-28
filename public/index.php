@@ -331,8 +331,8 @@ $app->group('/api', function(\Slim\App $app) {
 				'company_id',
 				'status',
 				'created_at',
-				'updated_at',
-				'project'
+				'updated_at'
+				//'project'
 				), $request, $response)){
 
 				$request_data = $request->getParsedBody();
