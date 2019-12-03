@@ -25,6 +25,9 @@ final class MyMiddleware
 
         echo $request->getUri()->getPath()[0];
         echo "\n";
+        echo $request->getUri()->getPath();
+        echo "\n";
+        
         if ($request->getUri()->getPath()[0] != "/")
             $path = "/" . $request->getUri()->getPath();
         echo $path;
