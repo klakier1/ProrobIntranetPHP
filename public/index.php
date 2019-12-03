@@ -604,10 +604,10 @@ $app->group('/api', function (\Slim\App $app) {
 		$log->addWarning(var_dump($request->getParsedBody()));
 		echo var_dump($request->getParsedBody());
 
-		echo "\n*******************PATH****************\n";
-		$request->getUri()->getPath();
-		echo "\n*******************REQUEST****************\n";
-		echo var_dump($request);
+		//echo "\n*******************PATH****************\n";
+		//$request->getUri()->getPath();
+		//echo "\n*******************REQUEST****************\n";
+		//echo var_dump($request);
 		return $response = standardResponse($response, 200, false, 'Echo ok');
 	});
 });

@@ -28,16 +28,15 @@ final class MyMiddleware
         echo $request->getUri()->getPath();
         echo "\n";
 
-        if ($request->getUri()->getPath()[0] != "/") {
-            $path = "/" . $request->getUri()->getPath();
-        } else {
-            $path = $request->getUri()->getPath();
-        }
+        $path = $request->getUri()->getPath();
+
+        if ($request->getUri()->getPath()[0] != "/")
+            $path = "/" . $path;
 
         echo $path;
 
         if (strpos($path, $this->allowedPath) === 0) {
-            echo "BEFORE_OK";
+
             $token = $request->getAttribute("decoded_token_data");
             $role = checkTokenData($token);
             if ($role == TOKEN_ADMIN || $role == TOKEN_EMPLOYEE) {
