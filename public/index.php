@@ -593,19 +593,21 @@ $app->group('/api', function (\Slim\App $app) {
 		$log->pushHandler(new StreamHandler('php://stderr', Logger::WARNING));
 
 		$log->addWarning("********************BODY*****************");
-		echo "********************BODY*****************\n";
+		echo "\n********************BODY*****************\n";
 
 		$log->addWarning($request->getBody());
 		echo $request->getBody();
 
 		$log->addWarning("*******************PARSED BODY****************");
-		echo "*******************PARSED BODY****************";
+		echo "\n*******************PARSED BODY****************\n";
 
 		$log->addWarning(var_dump($request->getParsedBody()));
 		echo var_dump($request->getParsedBody());
 
+		echo "\n*******************PATH****************\n";
 		$request->getUri()->getPath();
-
+		echo "\n*******************REQUEST****************\n";
+		echo var_dump($request);
 		return $response = standardResponse($response, 200, false, 'Echo ok');
 	});
 });
