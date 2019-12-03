@@ -13,7 +13,7 @@ final class MyMiddleware
     public function __construct(array $options = [])
     {
         if (isset($options["path"])) {
-            $allowedPath = $options["path"];
+            $this->allowedPath = $options["path"];
         }
     }
 
