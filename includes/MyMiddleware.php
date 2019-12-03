@@ -23,7 +23,8 @@ final class MyMiddleware
         callable $next
     ): ResponseInterface {
 
-        $path = "/" . $request->getUri()->getPath();
+        if ($request->getUri()->getPath()[0] != "/")
+            $path = "/" . $request->getUri()->getPath();
         if (strpos($path, $this->allowedPath) === 0) {
 
             $token = $request->getAttribute("decoded_token_data");
@@ -36,9 +37,9 @@ final class MyMiddleware
                 $response = standardResponse($response, 401, true, "Token verification failed");
                 return $response;
             }
-        } else { 
-            $response = $next($request, $response); 
-            return $response; 
+        } else {
+            $response = $next($request, $response);
+            return $response;
         }
     }
 }
