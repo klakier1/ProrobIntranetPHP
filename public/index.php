@@ -341,6 +341,13 @@ $app->group('/api', function (\Slim\App $app) {
 
 				$request_data = $request->getParsedBody();
 
+				$nullKeys = array('comments', 'project');
+				foreach ($nullKeys as $nullKey) {
+					if (!array_key_exists($nullKey, $request_data)) {
+						$request_data[$nullKey] = NULL;
+					}
+				}
+
 				if (checkTokenData($token) == TOKEN_EMPLOYEE && $token['id'] != $request_data['user_id'])
 					return $response = standardResponse($response, 401, true, 'Only admin can add timesheet row of other user');
 
