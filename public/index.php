@@ -145,8 +145,9 @@ $app->group('/api', function (\Slim\App $app) {
 		//get arguments
 		$token = $request->getAttribute("decoded_token_data");
 		$params = array_filter(explode('/', $args['params']));
+		$role = $request->getAttribute("role");
 
-		switch ($role = $request->getAttribute("role")) {
+		switch ($role) {
 			case TOKEN_ADMIN: {
 					/* Admin authorized  */
 
