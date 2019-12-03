@@ -30,6 +30,8 @@ final class MyMiddleware
 
         if ($request->getUri()->getPath()[0] != "/") {
             $path = "/" . $request->getUri()->getPath();
+        } else {
+            $path = $request->getUri()->getPath();
         }
 
         echo $path;
