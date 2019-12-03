@@ -23,6 +23,8 @@ final class MyMiddleware
         callable $next
     ): ResponseInterface {
 
+        echo $request->getUri()->getPath()[0];
+        echo "\n";
         if ($request->getUri()->getPath()[0] != "/")
             $path = "/" . $request->getUri()->getPath();
         if (strpos($path, $this->allowedPath) === 0) {
