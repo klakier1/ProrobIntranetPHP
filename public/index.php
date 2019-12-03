@@ -603,6 +603,8 @@ $app->group('/api', function (\Slim\App $app) {
 
 		$log->addWarning(var_dump($request->getParsedBody()));
 		echo var_dump($request->getParsedBody());
+
+		return $response = standardResponse($response, 200, false, 'Echo ok');
 	});
 });
 
