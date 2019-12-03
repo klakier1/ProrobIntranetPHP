@@ -11,11 +11,11 @@ if (PHP_SAPI == 'cli-server') {
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use \Firebase\JWT\JWT;
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
+include_once '../includes/constants.php';
 require '../vendor/autoload.php';
 require '../includes/responseProcess.php';
 require '../includes/dbOperation.php';
@@ -88,8 +88,7 @@ $app->group('/api', function (\Slim\App $app) {
 		method: POST
 	*/
 	$app->post('/user', function (Request $request, Response $response) {
-		$token = $request->getAttribute("decoded_token_data");
-		if (checkTokenData($token) == TOKEN_ADMIN) {
+		if ($request->getAttribute("role") == TOKEN_ADMIN) {
 			/* Admin authorized */
 			if (!haveEmptyParameters(array(
 				'email',
@@ -147,7 +146,7 @@ $app->group('/api', function (\Slim\App $app) {
 		$token = $request->getAttribute("decoded_token_data");
 		$params = array_filter(explode('/', $args['params']));
 
-		switch ($role = checkTokenData($token)) {
+		switch ($role = $request->getAttribute("role")) {
 			case TOKEN_ADMIN: {
 					/* Admin authorized  */
 
@@ -204,8 +203,7 @@ $app->group('/api', function (\Slim\App $app) {
 		method: DELETE
 	*/
 	$app->delete('/user[/{params:.*}]', function (Request $request, Response $response, $args) {
-		$token = $request->getAttribute("decoded_token_data");
-		if (checkTokenData($token) == TOKEN_ADMIN) {
+		if ($request->getAttribute("role") == TOKEN_ADMIN) {
 			/* Admin authorized  */
 			$params = array_filter(explode('/', $args['params']));
 
@@ -266,7 +264,7 @@ $app->group('/api', function (\Slim\App $app) {
 		$token = $request->getAttribute("decoded_token_data");
 		$params = array_filter(explode('/', $args['params']));
 
-		switch ($role = checkTokenData($token)) {
+		switch ($role = $request->getAttribute("role")) {
 			case TOKEN_ADMIN: {
 					/* Admin authorized  */
 
@@ -323,7 +321,8 @@ $app->group('/api', function (\Slim\App $app) {
 
 	$app->post('/timesheet', function (Request $request, Response $response) {
 		$token = $request->getAttribute("decoded_token_data");
-		if (checkTokenData($token) == TOKEN_ADMIN || checkTokenData($token) == TOKEN_EMPLOYEE) {
+		$role = $request->getAttribute("role");
+		if ($role == TOKEN_ADMIN || $role == TOKEN_EMPLOYEE) {
 			if (!haveEmptyParameters(array(
 				'user_id',
 				'date',
@@ -349,7 +348,7 @@ $app->group('/api', function (\Slim\App $app) {
 					}
 				}
 
-				if (checkTokenData($token) == TOKEN_EMPLOYEE && $token['id'] != $request_data['user_id'])
+				if ($role == TOKEN_EMPLOYEE && $token['id'] != $request_data['user_id'])
 					return $response = standardResponse($response, 401, true, 'Only admin can add timesheet row of other user');
 
 				$db = new DbOperation;
@@ -393,6 +392,7 @@ $app->group('/api', function (\Slim\App $app) {
 	$app->delete('/timesheet/id/{id}', function (Request $request, Response $response, $args) {
 
 		$token = $request->getAttribute("decoded_token_data");
+		$role = $request->getAttribute("role");
 		$db = new DbOperation;
 
 		//check if timesheet row exist
@@ -401,7 +401,7 @@ $app->group('/api', function (\Slim\App $app) {
 		if ($timesheet['data_length'] == 0)
 			return $response = standardResponse($response, 422, true, 'Time sheet not exist');
 
-		switch ($role = checkTokenData($token)) {
+		switch ($role) {
 			case TOKEN_EMPLOYEE: {
 
 					//user can delete only his row
@@ -455,6 +455,7 @@ $app->group('/api', function (\Slim\App $app) {
 				'project',
 			), $request, $response)) {
 
+				$role = $request->getAttribute("role");
 				$token = $request->getAttribute("decoded_token_data");
 				$request_data = $request->getParsedBody();
 
@@ -473,7 +474,7 @@ $app->group('/api', function (\Slim\App $app) {
 				if ($timesheet['data_length'] == 0)
 					return $response = standardResponse($response, 422, true, 'Time sheet not exist');
 
-				switch ($role = checkTokenData($token)) {
+				switch ($role) {
 					case TOKEN_EMPLOYEE: {
 							//user can update only his row
 							if ($timesheet['data_length'] == 1 && $timesheet['data'][0]['user_id'] == $token['id']) {
@@ -515,10 +516,10 @@ $app->group('/api', function (\Slim\App $app) {
 		method: GET
 	*/
 	$app->get('/countries', function (Request $request, Response $response, $args) {
-		//get arguments
-		$token = $request->getAttribute("decoded_token_data");
 
-		switch ($role = checkTokenData($token)) {
+		$role = $request->getAttribute("role");
+
+		switch ($role) {
 			case TOKEN_ADMIN:
 			case TOKEN_EMPLOYEE: {
 
@@ -546,9 +547,10 @@ $app->group('/api', function (\Slim\App $app) {
 		method: GET
 	*/
 	$app->get('/objectives', function (Request $request, Response $response, $args) {
-		$token = $request->getAttribute("decoded_token_data");
 
-		switch ($role = checkTokenData($token)) {
+		$role = $request->getAttribute("role");
+
+		switch ($role) {
 			case TOKEN_ADMIN:
 			case TOKEN_EMPLOYEE: {
 
@@ -585,7 +587,7 @@ $app->group('/api', function (\Slim\App $app) {
 		}
 	});
 
-	$app->map(['GET', 'POST', 'PUT', 'DELETE'], '/test', function (Request $request, Response $response, $args) {
+	$app->map(['GET', 'POST', 'PUT', 'DELETE'], '/echo', function (Request $request, Response $response, $args) {
 		$log = new Logger(DEBUG_TAG);
 		$log->pushHandler(new StreamHandler('php://stderr', Logger::WARNING));
 

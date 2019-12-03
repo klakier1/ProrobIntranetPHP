@@ -6,7 +6,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-
 final class MyMiddleware
 {
     public function __invoke(
@@ -14,11 +13,20 @@ final class MyMiddleware
         ResponseInterface $response,
         callable $next
     ): ResponseInterface {
-        $response->getBody()->write('BEFORE');
-        //$response = $next($request, $response);
-        $response->getBody()->write('AFTER');
-
-        return $response;
+        $token = $request->getAttribute("decoded_token_data");
+        $role = checkTokenData($token);
+        if($role == TOKEN_ADMIN || $role == TOKEN_EMPLOYEE)
+        {
+            $request = $request->withAttribute("role", $role);  //set Attribute
+            $response = $next($request, $response);             //call next middleware
+            return $response;
+        }
+        else
+        {
+            $response = standardResponse($response, 401, true, "Token verification failed");
+            return $response;
+        }
+       
     }
 
 }
