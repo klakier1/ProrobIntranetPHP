@@ -1,5 +1,6 @@
 <?php 
-
+    define('DEBUG_TAG','KlakierDebug');
+    
     define('TOKEN_ADMIN', "admin");
     define('TOKEN_EMPLOYEE', "employee");
     define('TOKEN_ERROR', "error");
@@ -15,8 +16,10 @@
     define('PASSWORD_CHANGED', 301);
     define('PASSWORD_DO_NOT_MATCH', 302);
     define('PASSWORD_NOT_CHANGED', 303);
+
     define('GET_USERS_SUCCESS', 401);
     define('GET_USERS_FAILURE', 402);
+    define('TIMESHEET_NOT_FOUND', 499);
     define('DELETE_USER_SUCCESS', 501);
     define('DELETE_USER_FAILURE', 502);
     define('GET_TIMESHEET_SUCCESS', 601);
@@ -25,5 +28,8 @@
     define('INSERT_TIMESHEETROW_FAILURE', 604);
     define('DELETE_TIMESHEETROW_SUCCESS', 605);
     define('DELETE_TIMESHEETROW_FAILURE', 606);
+    define('UPDATE_TIMESHEETROW_SUCCESS', 607);
+    define('UPDATE_TIMESHEETROW_FAILURE', 608);
+
     define('GET_COUNTRIES_SUCCESS', 701);
     define('GET_COUNTRIES_FAILURE', 702);
