@@ -27,6 +27,7 @@ final class MyMiddleware
         echo "\n";
         if ($request->getUri()->getPath()[0] != "/")
             $path = "/" . $request->getUri()->getPath();
+        echo $path;
         if (strpos($path, $this->allowedPath) === 0) {
 
             $token = $request->getAttribute("decoded_token_data");
