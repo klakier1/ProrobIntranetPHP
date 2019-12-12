@@ -153,13 +153,18 @@ $app->group('/api', function (\Slim\App $app) {
 	$app->get('/user[/{params:.*}]', function (Request $request, Response $response, $args) {
 		//get arguments
 		$token = $request->getAttribute("decoded_token_data");
+<<<<<<< HEAD
 		$params = [];
 		if(count($args) != 0)
 			$params = array_filter(explode('/', $args['params']));
 		$result = null;
 		$db = new DbOperation;
+=======
+		$params = array_filter(explode('/', $args['params']));
+		$role = $request->getAttribute("role");
+>>>>>>> 7cc5b5cebb09444859ec2afa93305ba8c9c82ded
 
-		switch ($role = $request->getAttribute("role")) {
+		switch ($role) {
 			case TOKEN_ADMIN: {
 					/* Admin authorized  */
 					/* no args          - all users, all data*************************************************** */
@@ -597,16 +602,22 @@ $app->group('/api', function (\Slim\App $app) {
 		$log->pushHandler(new StreamHandler('php://stderr', Logger::WARNING));
 
 		$log->addWarning("********************BODY*****************");
-		echo "********************BODY*****************\n";
+		echo "\n********************BODY*****************\n";
 
 		$log->addWarning($request->getBody());
 		echo $request->getBody();
 
 		$log->addWarning("*******************PARSED BODY****************");
-		echo "*******************PARSED BODY****************";
+		echo "\n*******************PARSED BODY****************\n";
 
 		$log->addWarning(var_dump($request->getParsedBody()));
 		echo var_dump($request->getParsedBody());
+
+		//echo "\n*******************PATH****************\n";
+		//$request->getUri()->getPath();
+		//echo "\n*******************REQUEST****************\n";
+		//echo var_dump($request);
+		return $response = standardResponse($response, 200, false, 'Echo ok');
 	});
 });
 
