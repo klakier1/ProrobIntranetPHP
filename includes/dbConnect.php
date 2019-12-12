@@ -26,7 +26,12 @@
             } 
             catch(PDOException $e)
             {
-                echo "Failed to connect " . $e->getCode() . " " . $e->getMessage();
+                //echo "Failed to connect " . $e->getCode() . " " . $e->getMessage();
+                return null;
+            }
+            catch(Exception $e)
+            {
+                //echo "Failed to connect " . $e->getCode() . " " . $e->getMessage();
                 return null;
             }
 
@@ -35,7 +40,8 @@
 
         function getDbCredentials(){
 
-            $database_url = getenv("DATABASE_URL_PROROB");
+            //$database_url = getenv("DATABASE_URL_PROROB");
+            $database_url = getenv("DATABASE_URL_LOCAL");
             return parse_url($database_url);
         }
     }

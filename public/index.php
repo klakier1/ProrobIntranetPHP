@@ -9,24 +9,33 @@ if (PHP_SAPI == 'cli-server') {
 	}
 }
 
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
-
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-
 include_once '../includes/constants.php';
 require '../vendor/autoload.php';
 require '../includes/responseProcess.php';
 require '../includes/dbOperation.php';
 require '../includes/token.php';
-require '../includes/MyMiddleware.php';
+//require '../includes/MyMiddleware.php';
+
+
+
+use Klakier\ErrorHandlerProvider;
+
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
+use Slim\Http\Response as Resp;
+
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 $app = new \Slim\App([
-	'settings' => [
-		'displayErrorDetails' => true
-	]
+	// 'settings' => [
+	// 	'displayErrorDetails' => true
+	// ]
 ]);
+
+$container = $app->getContainer();
+$container['phpErrorHandler'] = new Klakier\ErrorHandlerProvider();
+$container['errorHandler'] = new Klakier\ErrorHandlerProvider();
 
 // Register middleware
 require '../src/middleware.php';
@@ -144,49 +153,33 @@ $app->group('/api', function (\Slim\App $app) {
 	$app->get('/user[/{params:.*}]', function (Request $request, Response $response, $args) {
 		//get arguments
 		$token = $request->getAttribute("decoded_token_data");
-		$params = array_filter(explode('/', $args['params']));
+		$params = [];
+		if(count($args) != 0)
+			$params = array_filter(explode('/', $args['params']));
+		$result = null;
+		$db = new DbOperation;
 
 		switch ($role = $request->getAttribute("role")) {
 			case TOKEN_ADMIN: {
 					/* Admin authorized  */
-
 					/* no args          - all users, all data*************************************************** */
 					if (count($params) == 0) {
-						$db = new DbOperation;
 						$result = $db->getAllUsers($ret);
-
-						if ($result == GET_USERS_SUCCESS) {
-							return $response = standardResponse($response, 200, false, 'Get users successfull', $ret);
-						} else if ($result == GET_USERS_FAILURE) {
-							return $response = standardResponse($response, 422, true, 'Some error occurred');
-						} else if ($result == DB_ERROR) {
-							return $response = standardResponse($response, 500, true, 'Database error');
-						}
 					}
 					/****************************************************************************************** */
 				}
 			case TOKEN_EMPLOYEE: {
-
 					/* /user/id/[0-9]   -one user, short data************************************************** */
 					if (count($params) == 2 && $params[0] == 'id') {
 						$request_id = intval($params[1]);
 						if ($token['id'] == $request_id || $role == TOKEN_ADMIN) //admin can get any user
 						{
-							$db = new DbOperation;
 							$result = $db->getUserShort($request_id, $ret);
-
-							if ($result == GET_USERS_SUCCESS) {
-								return $response = standardResponse($response, 200, false, 'Get user successfull', $ret);
-							} else if ($result == GET_USERS_FAILURE) {
-								return $response = standardResponse($response, 422, true, 'Some error occurred');
-							} else if ($result == GET_USERS_NOT_FOUND) {
-								return $response = standardResponse($response, 422, true, 'User not found');
-							} else if ($result == DB_ERROR) {
-								return $response = standardResponse($response, 500, true, 'Database error');
-							}
 						}
+					} else if(count($params) == 0) {
+						$result = $db->getAllUsersShort($ret);
 					}
-					return $response = standardResponse($response, 400, true, 'Bad Request');
+
 					/**************************************************************************************** */
 
 					break;
@@ -194,6 +187,18 @@ $app->group('/api', function (\Slim\App $app) {
 			case TOKEN_ERROR: {
 					return $response = standardResponse($response, 400, true, 'Token invalid');
 				}
+		}
+
+		if ($result == GET_USERS_SUCCESS) {
+			return $response = standardResponse($response, 200, false, 'Get user successfull', $ret);
+		} else if ($result == GET_USERS_FAILURE) {
+			return $response = standardResponse($response, 422, true, 'Some error occurred');
+		} else if ($result == GET_USERS_NOT_FOUND) {
+			return $response = standardResponse($response, 422, true, 'User not found');
+		} else if ($result == DB_ERROR) {
+			return $response = standardResponse($response, 500, true, 'Database error');
+		} else {
+			return $response = standardResponse($response, 400, true, 'Bad Request');
 		}
 	});
 

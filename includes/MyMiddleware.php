@@ -1,6 +1,6 @@
 <?php
 
-namespace Klakier\Middleware;
+namespace Klakier;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;

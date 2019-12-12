@@ -13,8 +13,10 @@ class DbOperation
         require_once dirname(__FILE__) . '/dbConnect.php';
         $db = new DbConnect();
         if ($db == null)
-            throw new Exception("Can't connect with database");
+            throw new Exception("Can't connect with database, PDO is null.");
         $this->con = $db->connect();
+        if ($this->con == null)
+            throw new Exception("Can't connect with database, connection is null");
     }
 
     public function login($email, $pass, &$id, &$role)
@@ -153,6 +155,27 @@ class DbOperation
             return DB_ERROR;
 
         $query = $this->con->prepare('SELECT * FROM public.users', array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+        if ($query->execute()) {
+            $result['data_length'] = $query->rowCount();
+            while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+                $result['data'][] = $row;
+            }
+            return GET_USERS_SUCCESS;
+        } else {
+            return GET_USERS_FAILURE;
+        }
+    }
+
+    public function getAllUsersShort(&$result)
+    {
+        if ($this->con == null)
+            return DB_ERROR;
+
+        $query = $this->con->prepare(
+                'SELECT email, avatar_file_name, avatar_content_type, avatar_file_size, role, active, first_name, last_name, title, phone
+                        FROM public.users',
+                array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY)
+        );
         if ($query->execute()) {
             $result['data_length'] = $query->rowCount();
             while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
