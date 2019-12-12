@@ -30,8 +30,8 @@ $app = new \Slim\App([
 ]);
 
 $container = $app->getContainer();
-$container['phpErrorHandler'] = new ErrorHandlerProvider();
-$container['errorHandler'] = new ErrorHandlerProvider();
+//$container['phpErrorHandler'] = new ErrorHandlerProvider();
+//$container['errorHandler'] = new ErrorHandlerProvider();
 
 // Register middleware
 require '../src/middleware.php';
