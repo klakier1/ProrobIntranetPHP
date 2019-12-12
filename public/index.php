@@ -14,15 +14,11 @@ require '../vendor/autoload.php';
 require '../includes/responseProcess.php';
 require '../includes/dbOperation.php';
 require '../includes/token.php';
-//require '../includes/MyMiddleware.php';
-
-
 
 use Klakier\ErrorHandlerProvider;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use Slim\Http\Response as Resp;
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
@@ -34,8 +30,8 @@ $app = new \Slim\App([
 ]);
 
 $container = $app->getContainer();
-$container['phpErrorHandler'] = new Klakier\ErrorHandlerProvider();
-$container['errorHandler'] = new Klakier\ErrorHandlerProvider();
+$container['phpErrorHandler'] = new ErrorHandlerProvider();
+$container['errorHandler'] = new ErrorHandlerProvider();
 
 // Register middleware
 require '../src/middleware.php';
@@ -158,6 +154,7 @@ $app->group('/api', function (\Slim\App $app) {
 		if(count($args) != 0)
 			$params = array_filter(explode('/', $args['params']));
 		$result = null;
+		$ret = null;
 		$db = new DbOperation;
 
 		switch ($role) {

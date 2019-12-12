@@ -4,7 +4,6 @@ namespace Klakier;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 
 final class MyMiddleware
 {
