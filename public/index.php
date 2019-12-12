@@ -153,16 +153,11 @@ $app->group('/api', function (\Slim\App $app) {
 	$app->get('/user[/{params:.*}]', function (Request $request, Response $response, $args) {
 		//get arguments
 		$token = $request->getAttribute("decoded_token_data");
-<<<<<<< HEAD
 		$params = [];
 		if(count($args) != 0)
 			$params = array_filter(explode('/', $args['params']));
 		$result = null;
 		$db = new DbOperation;
-=======
-		$params = array_filter(explode('/', $args['params']));
-		$role = $request->getAttribute("role");
->>>>>>> 7cc5b5cebb09444859ec2afa93305ba8c9c82ded
 
 		switch ($role) {
 			case TOKEN_ADMIN: {

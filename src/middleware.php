@@ -2,7 +2,7 @@
 
 use Slim\App;
 
-$app->add(new \Klakier\Middleware\MyMiddleware([
+$app->add(new \Klakier\MyMiddleware([
     "path" => "/api"
 ]));
 
