@@ -15,7 +15,7 @@ require '../includes/responseProcess.php';
 require '../includes/dbOperation.php';
 require '../includes/token.php';
 
-use \Klakier\ErrorHandlerProvider;
+use Klakier\ErrorHandlerProvider;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
