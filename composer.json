@@ -28,7 +28,7 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/",
-            "Klakier\\": "includes/"
+            "Klakier\\": ""
         }
     },
     "config": {
@@ -37,6 +37,7 @@
     },
     "scripts": {
         "start": "php -S localhost:8080 -t public",
-        "test": "phpunit"
+        "test": "phpunit",
+        "composer dump-autoload --optimize"
     }
 }
