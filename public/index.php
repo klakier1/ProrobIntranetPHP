@@ -606,7 +606,7 @@ $app->group('/api', function (\Slim\App $app) {
 
 		$log->addWarning(var_dump($request->getParsedBody()));
 		echo var_dump($request->getParsedBody());
-
+		throw new Exception("test exception", 666);
 		//echo "\n*******************PATH****************\n";
 		//$request->getUri()->getPath();
 		//echo "\n*******************REQUEST****************\n";
