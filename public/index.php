@@ -153,6 +153,7 @@ $app->group('/api', function (\Slim\App $app) {
 	$app->get('/user[/{params:.*}]', function (Request $request, Response $response, $args) {
 		//get arguments
 		$token = $request->getAttribute("decoded_token_data");
+		$role = $request->getAttribute("role");
 		$params = [];
 		if(count($args) != 0)
 			$params = array_filter(explode('/', $args['params']));
@@ -165,6 +166,8 @@ $app->group('/api', function (\Slim\App $app) {
 					/* no args          - all users, all data*************************************************** */
 					if (count($params) == 0) {
 						$result = $db->getAllUsers($ret);
+						break;  //if no args, get all users and break,
+								//otherwise don't break and go to TOKEN_EMPLOYEE case
 					}
 					/****************************************************************************************** */
 				}
@@ -179,7 +182,6 @@ $app->group('/api', function (\Slim\App $app) {
 					} else if(count($params) == 0) {
 						$result = $db->getAllUsersShort($ret);
 					}
-
 					/**************************************************************************************** */
 
 					break;
