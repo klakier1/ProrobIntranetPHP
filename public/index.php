@@ -39,15 +39,11 @@ require '../src/middleware.php';
 $app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
 	$name = $args['name'];
 	$response->getBody()->write("Hello, $name");
+});
 
-
-	/*$db = new DbConnect();
-
-	if($db->connect() != null){
-		$response->getBody()->write(' Connection OK');
-	}*/
-
-	return $response;
+$app->get('/phpinfo', function (Request $request, Response $response, array $args) {
+	phpinfo();
+	return;
 });
 
 /*
@@ -560,21 +556,17 @@ $app->group('/api', function (\Slim\App $app) {
 
 					$db = new DbOperation;
 					$result = $db->getCountries($retCountries);
-					$splitedObj = array();
-
+					
+					$objectives = [];
 					foreach ($retCountries['data'] as $country) {
 						if ($country['objectives'] != null) {
-							$rawObjectives = explode("\n", $country['objectives']);
-							foreach ($rawObjectives as $rawObjective) {
-								if (!($rawObjective == "" || $rawObjective == "---")) {
-									array_push($splitedObj, ltrim($rawObjective, "- "));
-								}
-							}
+							$objectives = array_merge($objectives, yaml_parse($country['objectives']));
 						}
 					}
-
-					$ret['data_length'] = count($splitedObj);
-					$ret['data'] = $splitedObj;
+					
+					$ret = [];
+					$ret['data_length'] = count($ret['data']);
+					$ret['data'] = $objectives;
 
 					if ($result == GET_COUNTRIES_SUCCESS) {
 						return $response = standardResponse($response, 200, false, 'Get objectives successfull', $ret);
