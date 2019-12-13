@@ -527,8 +527,12 @@ $app->group('/api', function (\Slim\App $app) {
 
 					$db = new DbOperation;
 					$result = $db->getCountries($ret);
-
+					
 					if ($result == GET_COUNTRIES_SUCCESS) {
+						foreach ($ret['data'] as &$country) {
+							if($country['objectives'] != null)
+								$country['objectives'] = Yaml::parse($country['objectives']);
+						}
 						return $response = standardResponse($response, 200, false, 'Get countries successfull', $ret);
 					} else if ($result == GET_COUNTRIES_FAILURE) {
 						return $response = standardResponse($response, 422, true, 'Some error occurred');
