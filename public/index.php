@@ -20,6 +20,8 @@ use Klakier\ErrorHandlerProvider;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
+use Symfony\Component\Yaml\Yaml;
+
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
@@ -560,7 +562,7 @@ $app->group('/api', function (\Slim\App $app) {
 					$objectives = [];
 					foreach ($retCountries['data'] as $country) {
 						if ($country['objectives'] != null) {
-							$objectives = array_merge($objectives, yaml_parse($country['objectives']));
+							$objectives = array_merge($objectives, Yaml::parse($country['objectives']));
 						}
 					}
 					
