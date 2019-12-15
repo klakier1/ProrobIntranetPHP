@@ -34,3 +34,6 @@
 
     define('GET_COUNTRIES_SUCCESS', 701);
     define('GET_COUNTRIES_FAILURE', 702);
+
+    define('GET_DELEGATION_SUCCESS', 601);
+    define('GET_DELEGATION_FAILURE', 602);

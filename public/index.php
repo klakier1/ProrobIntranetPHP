@@ -16,11 +16,14 @@ require '../includes/dbOperation.php';
 require '../includes/token.php';
 
 use Klakier\ErrorHandlerProvider;
+use Klakier\PageNotFoundHandler;
+use Klakier\YamlUtils;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Tag\TaggedValue;
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
@@ -34,19 +37,23 @@ $app = new \Slim\App([
 $container = $app->getContainer();
 $container['phpErrorHandler'] = new ErrorHandlerProvider();
 $container['errorHandler'] = new ErrorHandlerProvider();
+$container['notFoundHandler'] = new PageNotFoundHandler();
 
 // Register middleware
 require '../src/middleware.php';
 
-$app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
+/* $app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
 	$name = $args['name'];
 	$response->getBody()->write("Hello, $name");
-});
+}); */
 
-$app->get('/phpinfo', function (Request $request, Response $response, array $args) {
-	phpinfo();
-	return;
-});
+/* $app->get('/test', function (Request $request, Response $response, array $args) {
+
+	$value = Yaml::parseFile('test2.yml', Yaml::PARSE_CUSTOM_TAGS);
+	$val = YamlUtils::taggedValueToArray($value);
+	$val = Yaml::parseFile('test2.yml');
+	return $response = standardResponse($response, 200, false, 'Yaml parsing test', ['data' => $val]);
+}); */
 
 /*
 	endpoint: login
@@ -149,7 +156,7 @@ $app->group('/api', function (\Slim\App $app) {
 		$token = $request->getAttribute("decoded_token_data");
 		$role = $request->getAttribute("role");
 		$params = [];
-		if(count($args) != 0)
+		if (count($args) != 0)
 			$params = array_filter(explode('/', $args['params']));
 		$result = null;
 		$ret = null;
@@ -162,7 +169,7 @@ $app->group('/api', function (\Slim\App $app) {
 					if (count($params) == 0) {
 						$result = $db->getAllUsers($ret);
 						break;  //if no args, get all users and break,
-								//otherwise don't break and go to TOKEN_EMPLOYEE case
+						//otherwise don't break and go to TOKEN_EMPLOYEE case
 					}
 					/****************************************************************************************** */
 				}
@@ -174,7 +181,7 @@ $app->group('/api', function (\Slim\App $app) {
 						{
 							$result = $db->getUserShort($request_id, $ret);
 						}
-					} else if(count($params) == 0) {
+					} else if (count($params) == 0) {
 						$result = $db->getAllUsersShort($ret);
 					}
 					/**************************************************************************************** */
@@ -527,10 +534,10 @@ $app->group('/api', function (\Slim\App $app) {
 
 					$db = new DbOperation;
 					$result = $db->getCountries($ret);
-					
+
 					if ($result == GET_COUNTRIES_SUCCESS) {
 						foreach ($ret['data'] as &$country) {
-							if($country['objectives'] != null)
+							if ($country['objectives'] != null)
 								$country['objectives'] = Yaml::parse($country['objectives']);
 						}
 						return $response = standardResponse($response, 200, false, 'Get countries successfull', $ret);
@@ -562,14 +569,14 @@ $app->group('/api', function (\Slim\App $app) {
 
 					$db = new DbOperation;
 					$result = $db->getCountries($retCountries);
-					
+
 					$objectives = [];
 					foreach ($retCountries['data'] as $country) {
 						if ($country['objectives'] != null) {
 							$objectives = array_merge($objectives, Yaml::parse($country['objectives']));
 						}
 					}
-					
+
 					$ret = [];
 					$ret['data_length'] = count($ret['data']);
 					$ret['data'] = $objectives;
@@ -589,7 +596,65 @@ $app->group('/api', function (\Slim\App $app) {
 		}
 	});
 
-	$app->map(['GET', 'POST', 'PUT', 'DELETE'], '/echo', function (Request $request, Response $response, $args) {
+	/*
+		endpoint: delegation
+		parameters: delegation/user_id/...
+		method: GET
+	*/
+	$app->get('/delegation[/{params:.*}]', function (Request $request, Response $response, $args) {
+		//get arguments
+		$token = $request->getAttribute("decoded_token_data");
+		$params = [];
+		if (isset($args['params']))
+			$params = array_filter(explode('/', $args['params']));
+		$result = 0;
+
+		switch ($role = $request->getAttribute("role")) {
+			case TOKEN_ADMIN: {
+					/* Admin authorized  */
+					/* no args        - all users, all delegations*************************************************** */
+					if (count($params) == 0) {
+						$db = new DbOperation;
+						$result = $db->getDelegation($ret);
+					}
+				}
+			case TOKEN_EMPLOYEE: {
+
+					/* /delegation/user_id/[0-9]   -one user, all data************************************************** */
+					if (count($params) == 2 && $params[0] == 'user_id') {
+						$request_id = intval($params[1]);
+						if ($token['id'] == $request_id || $role == TOKEN_ADMIN) //admin can get any user
+						{
+							$db = new DbOperation;
+							$result = $db->getDelegationByUser($request_id, $ret);
+						}
+					}
+					break;
+				}
+			case TOKEN_ERROR: {
+					return $response = standardResponse($response, 400, true, 'Token invalid');
+				}
+		}
+		if ($result == GET_DELEGATION_SUCCESS) {
+			if ($ret['data_length'] > 0) {
+				foreach ($ret['data'] as &$del) {
+					if (isset($del['country_spending'])) $del['country_spending'] = parseTaggedYaml($del['country_spending']);
+					if (isset($del['foreign_spending'])) $del['foreign_spending'] = parseTaggedYaml($del['foreign_spending']);
+					if (isset($del['currencies'])) $del['currencies'] = parseTaggedYaml($del['currencies']);
+					if (isset($del['border_crossing'])) $del['border_crossing'] = parseTaggedYaml($del['border_crossing']);
+				}
+			}
+			return $response = standardResponse($response, 200, false, 'Get delegation successfull', $ret);
+		} else if ($result == GET_DELEGATION_FAILURE) {
+			return $response = standardResponse($response, 422, true, 'Some error occurred');
+		} else if ($result == DB_ERROR) {
+			return $response = standardResponse($response, 500, true, 'Database error');
+		} else {
+			return $response = standardResponse($response, 400, true, 'Bad Request');
+		}
+	});
+
+/* 	$app->map(['GET', 'POST', 'PUT', 'DELETE'], '/echo', function (Request $request, Response $response, $args) {
 		$log = new Logger(DEBUG_TAG);
 		$log->pushHandler(new StreamHandler('php://stderr', Logger::WARNING));
 
@@ -610,7 +675,7 @@ $app->group('/api', function (\Slim\App $app) {
 		//echo "\n*******************REQUEST****************\n";
 		//echo var_dump($request);
 		return $response = standardResponse($response, 200, false, 'Echo ok');
-	});
+	}); */
 });
 
 function haveEmptyParameters($required_params, Request $request, Response &$response)
@@ -670,6 +735,15 @@ function isValidEmail(&$email)
 
 	// In this point must be valid
 	return true;
+}
+
+function parseTaggedYaml($in)
+{
+	if ($in != null) {
+		$in = Yaml::parse($in, Yaml::PARSE_CUSTOM_TAGS);
+		$in = YamlUtils::taggedValueToArray($in);
+	}
+	return $in;
 }
 
 $app->run();

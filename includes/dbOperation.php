@@ -469,6 +469,54 @@ class DbOperation
             return GET_COUNTRIES_FAILURE;
         }
     }
+    // DELEGATIONS FUNTIONS **********************************************************
+
+    public function getDelegation(&$result)
+    {
+        if ($this->con == null)
+            return DB_ERROR;
+
+        $query = $this->con->prepare(
+            'SELECT id, user_id, status, place, transport, objective, country_spending, foreign_spending, start_date, end_date, created_at, updated_at, currencies, border_crossing, country_cash_per_day, foreign_cash_per_day, foreign_cash_currency, given_cash_currency, given_cash, car_number, car_engine, delegation_type, country_id, notes, given_cash_pln, hotel_cash_per_day, country_hotel_cash_per_day
+                FROM public.delegations;',
+            array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY)
+        );
+
+        if ($query->execute()) {
+            $result['data_length'] = $query->rowCount();
+            while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+                $result['data'][] = $row;
+            }
+
+            return GET_DELEGATION_SUCCESS;
+        } else {
+            return GET_DELEGATION_FAILURE;
+        }
+    }
+
+    public function getDelegationByUser($user_id, &$result)
+    {
+        if ($this->con == null)
+            return DB_ERROR;
+
+        $query = $this->con->prepare(
+            'SELECT id, user_id, status, place, transport, objective, country_spending, foreign_spending, start_date, end_date, created_at, updated_at, currencies, border_crossing, country_cash_per_day, foreign_cash_per_day, foreign_cash_currency, given_cash_currency, given_cash, car_number, car_engine, delegation_type, country_id, notes, given_cash_pln, hotel_cash_per_day, country_hotel_cash_per_day
+                FROM public.delegations WHERE user_id = :user_id;',
+            array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY)
+        );
+        $query->bindValue(':user_id', $user_id, PDO::PARAM_STR);
+
+        if ($query->execute()) {
+            $result['data_length'] = $query->rowCount();
+            while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+                $result['data'][] = $row;
+            }
+
+            return GET_DELEGATION_SUCCESS;
+        } else {
+            return GET_DELEGATION_FAILURE;
+        }
+    }
 
     // COMMON FUNCTIONS ***************************************************************
     private function createUpdateQuery(string $tablename, array $params, array $where, array $nullParams = []): string
