@@ -81,9 +81,9 @@ $app->post('/login', function (Request $request, Response $response, array $args
 			return $response = standardResponse($response, 401, true, 'Wrong password');
 		} else if ($result == USER_AUTHENTICATED) {
 			$token = getToken($user_id, $role);
-			if(isset($request_data['cookie']) && $request_data['cookie'] == true){
-				$expire = mktime(). time()+60*60*24*30;
-				setcookie("token", $token, $expire, '/', '', false , false);
+			if (isset($request_data['cookie']) && $request_data['cookie'] == true) {
+				$expire = time() + 60 * 60 * 24 * 30; //expire in 30 days
+				setcookie("token", $token, $expire, '/', '', false, true);
 			}
 			return $response = standardResponse($response, 200, false, 'Token generated', ['token' => $token]);
 		} else if ($result == DB_ERROR) {
@@ -658,7 +658,7 @@ $app->group('/api', function (\Slim\App $app) {
 		}
 	});
 
-/* 	$app->map(['GET', 'POST', 'PUT', 'DELETE'], '/echo', function (Request $request, Response $response, $args) {
+	/* 	$app->map(['GET', 'POST', 'PUT', 'DELETE'], '/echo', function (Request $request, Response $response, $args) {
 		$log = new Logger(DEBUG_TAG);
 		$log->pushHandler(new StreamHandler('php://stderr', Logger::WARNING));
 

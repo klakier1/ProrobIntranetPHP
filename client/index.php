@@ -1,11 +1,11 @@
 <?php
-	session_start();
+	// session_start();
 	
-	if((isset($_SESSION['zalogowany'])) && ($_SESSION['zalogowany']==true))
-	{
-		header('Location: gra.php');
-		exit();
-	}
+	// if((isset($_SESSION['zalogowany'])) && ($_SESSION['zalogowany']==true))
+	// {
+	// 	header('Location: gra.php');
+	// 	exit();
+	// }
 ?>
 
 <!DOCTYPE HTML>
@@ -40,7 +40,7 @@
 
 	</div>
 
-	<script src="jquery-3.4.1.js"></script>
+	<script src="jquery-3.4.1.js">console.log(document.cookie);</script>
 	<script src="login.js"></script>
 	
 </body>
