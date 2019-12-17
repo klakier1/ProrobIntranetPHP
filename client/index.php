@@ -25,7 +25,7 @@
 			<h3>Zaloguj się</h3>
 
 			
-			<form name="loginForm" method="post" onSubmit="login()">
+			<form id="loginForm" method="post" onSubmit="jQlogin()">
 			
 		<!--	<input type="text" name="login" placeholder="Login" onfocus="this.placeholder = '';" onblur="this.setAttribute('placeholder','Login');"/>		
 				<input type="password" name="haslo" placeholder="Hasło" onfocus="this.setAttribute('placeholder','');" onblur="this.placeholder='Hasło'"/>	-->		
@@ -36,6 +36,8 @@
 				
 			</form>
 		
+		<div class=error></div>
+
 	</div>
 
 	<script src="jquery-3.4.1.js"></script>

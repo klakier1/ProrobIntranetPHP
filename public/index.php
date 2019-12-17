@@ -81,6 +81,10 @@ $app->post('/login', function (Request $request, Response $response, array $args
 			return $response = standardResponse($response, 401, true, 'Wrong password');
 		} else if ($result == USER_AUTHENTICATED) {
 			$token = getToken($user_id, $role);
+			if(isset($request_data['cookie']) && $request_data['cookie'] == true){
+				$expire = mktime(). time()+60*60*24*30;
+				setcookie("token", $token, $expire, '/', '', false , false);
+			}
 			return $response = standardResponse($response, 200, false, 'Token generated', ['token' => $token]);
 		} else if ($result == DB_ERROR) {
 			return $response = standardResponse($response, 500, true, 'Database error');
