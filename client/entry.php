@@ -1,4 +1,32 @@
 <?php
+
+	require '../vendor/autoload.php';
+
+	use Firebase\JWT\JWT;
+
+	if(isset($_COOKIE['token']))
+	{
+		
+		$decoded = JWT::decode(
+			$_COOKIE['token'],
+			getenv("JWT_SECRET"),
+			["HS256"]);
+
+		if($decoded->version == getenv("TOKEN_VERSION")) {
+			setcookie("id", $decoded->id);
+			setcookie("role", $decoded->role);
+			redirect("panel.php");
+		} else {
+			setcookie("id", null, time() - 3600);
+			setcookie("role", null, time() - 3600);
+			setcookie("token", null, time() - 3600);
+		}
+	}
+
+	function redirect($url, $statusCode = 303) {
+		header('Location: ' . $url, true, $statusCode);
+		die();
+	}
 	// session_start();
 	
 	// if((isset($_SESSION['zalogowany'])) && ($_SESSION['zalogowany']==true))
@@ -24,7 +52,6 @@
 			<h2>Pro-Rob Intranet API</h2>
 			<h3>Zaloguj się</h3>
 
-			
 			<form id="loginForm" method="post" onSubmit="jQlogin()">
 			
 		<!--	<input type="text" name="login" placeholder="Login" onfocus="this.placeholder = '';" onblur="this.setAttribute('placeholder','Login');"/>		

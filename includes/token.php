@@ -28,7 +28,14 @@ use \Firebase\JWT\JWT;
 
     function getToken($user_id, $role)
     {
-        return JWT::encode(['id' => $user_id, 'role' => $role, 'version' => getenv("TOKEN_VERSION")], getenv("JWT_SECRET"), "HS256");
+        return JWT::encode(
+            [
+                'id' => $user_id, 
+                'role' => $role, 
+                'version' => getenv("TOKEN_VERSION")
+            ],
+            getenv("JWT_SECRET"), 
+            "HS256");
     }
 
 

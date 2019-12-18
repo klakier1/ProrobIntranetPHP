@@ -28,6 +28,8 @@ use Symfony\Component\Yaml\Tag\TaggedValue;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
+use Slim\Views\PhpRenderer;
+
 $app = new \Slim\App([
 	// 'settings' => [
 	// 	'displayErrorDetails' => true
@@ -38,6 +40,7 @@ $container = $app->getContainer();
 $container['phpErrorHandler'] = new ErrorHandlerProvider();
 $container['errorHandler'] = new ErrorHandlerProvider();
 $container['notFoundHandler'] = new PageNotFoundHandler();
+$container['renderer'] = new PhpRenderer("../client");
 
 // Register middleware
 require '../src/middleware.php';

@@ -13,5 +13,8 @@
         "files": [
             "./.env"
         ]
+    },
+    "symfony/yaml": {
+        "version": "v5.0.1"
     }
 }
