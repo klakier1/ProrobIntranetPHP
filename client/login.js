@@ -11,7 +11,7 @@ function jQlogin() {
         data: requestData
     }
     ).done(function (arg) {
-        alert(arg);
+        window.location.href = "index.php"
     }
     ).fail(function (arg) {
         if (typeof arg.responseJSON !== "undefined")

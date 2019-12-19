@@ -11,10 +11,10 @@ body
 	font-family: 'Lato', sans-serif;
 }
 
-#container
+#container-login
 {
 	background-color: white;
-	width: 300px;
+	width: 450px;
 	padding: 40px 50px;
 	margin-left: auto;
 	margin-right: auto;
@@ -42,7 +42,7 @@ input[type=password],
 input[type=email]
 {
 	font-family: 'Lato', sans-serif;
-	width: 300px;
+	width: 100%;
 	background-color: #efefef;
 	color: #666;
 	border: 2px solid #ddd;
@@ -83,7 +83,7 @@ input[type=checkbox]
 input[type=submit]
 {
 	font-family: 'Lato', sans-serif;
-	width: 300px;
+	width: 100%;
 	background-color: var(--primary-color);
 	font-size: 20px;
 	color: white;
