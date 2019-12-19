@@ -20,19 +20,18 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 </head>
 
 <body>
-
 	<div id="container-panel">
-
 		<header>
-			<nav>
+			<nav class="navbar">
 				<ul>
-					<li>Czas pracy</li>
-					<li>Wyloguj</li>
+					<li><a href="#">Czas pracy</a></li>
+					<li><a href="logout.php">Wyloguj</a></li>
 				</ul>
 			</nav>
 		</header>
 
 		<div class=error></div>
+
 
 	</div>
 
