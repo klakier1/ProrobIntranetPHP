@@ -1,39 +1,9 @@
-<?php
-
-	require '../vendor/autoload.php';
-
-	use Firebase\JWT\JWT;
-
+<?php	
 	if(isset($_COOKIE['token']))
 	{
-		
-		$decoded = JWT::decode(
-			$_COOKIE['token'],
-			getenv("JWT_SECRET"),
-			["HS256"]);
-
-		if($decoded->version == getenv("TOKEN_VERSION")) {
-			setcookie("id", $decoded->id);
-			setcookie("role", $decoded->role);
-			redirect("panel.php");
-		} else {
-			setcookie("id", null, time() - 3600);
-			setcookie("role", null, time() - 3600);
-			setcookie("token", null, time() - 3600);
-		}
-	}
-
-	function redirect($url, $statusCode = 303) {
-		header('Location: ' . $url, true, $statusCode);
+		header('Location: index.php');
 		die();
 	}
-	// session_start();
-	
-	// if((isset($_SESSION['zalogowany'])) && ($_SESSION['zalogowany']==true))
-	// {
-	// 	header('Location: gra.php');
-	// 	exit();
-	// }
 ?>
 
 <!DOCTYPE HTML>
@@ -68,7 +38,7 @@
 	</div>
 
 	<script src="jquery-3.4.1.js">console.log(document.cookie);</script>
-	<script src="login.js"></script>
+	<script src="login.js?v=<?php echo time(); ?>"></script>
 	
 </body>
 </html>

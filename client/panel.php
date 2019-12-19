@@ -1,27 +1,7 @@
 <?php
-	use Firebase\JWT\JWT;
-
-	// if(isset($_COOKIE['token']))
-	// {
-		
-	// 	$decoded = JWT::decode(
-	// 		$_COOKIE['token'],
-	// 		getenv("JWT_SECRET"),
-	// 		["HS256"]);
-
-	// 	if($decoded->version == getenv("TOKEN_VERSION")) {
-	// 		setcookie("id", $decoded->id);
-	// 		setcookie("role", $decoded->role);
-	// 		redirect("panel.php");
-	// 	} else {
-	// 		setcookie("id", null, time() - 3600);
-	// 		setcookie("role", null, time() - 3600);
-	// 		setcookie("token", null, time() - 3600);
-	// 	}
-	// }
-
-	function redirect($url, $statusCode = 303) {
-		header('Location: ' . $url, true, $statusCode);
+	if(!isset($_COOKIE['token']) || !isset($_COOKIE['id']))
+	{
+		header('Location: index.php');
 		die();
 	}
 ?>
@@ -41,14 +21,14 @@
 	<div id="container-panel">
         
         <header>
-        
-        </header>
 		<nav>
             <ul>
                 <li>Czas pracy</li>
                 <li>Wyloguj</li>
             </ul>
         </nav>
+        </header>
+
 
 		<div class=error></div>
 

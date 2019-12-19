@@ -4,7 +4,7 @@ function jQlogin() {
     let requestData = $('#loginForm').serializeArray();
 
     $.ajax({
-        url: "../login", //wymagane, gdzie się łączymy
+        url: "../public/login", //wymagane, gdzie się łączymy
         method: "post", //typ połączenia, domyślnie get
         contentType: 'application/x-www-form-urlencoded', //gdy wysyłamy dane czasami chcemy ustawić ich typ
         dataType: 'json', //typ danych jakich oczekujemy w odpowiedzi

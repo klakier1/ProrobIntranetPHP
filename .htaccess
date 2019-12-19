@@ -15,10 +15,5 @@
   # If the above doesn't work you might need to set the `RewriteBase` directive manually, it should be the
   # absolute physical path to the directory that contains this htaccess file.
   # RewriteBase /
-
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^ public/index.php [QSA,L]
-  RewriteRule .* - [env=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
   
 </IfModule>
