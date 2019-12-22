@@ -52,6 +52,7 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 			</nav>
 		</header>
 
+		
 		<div class="error"></div>
 
 		<div class="container">
