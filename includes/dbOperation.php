@@ -172,7 +172,7 @@ class DbOperation
             return DB_ERROR;
 
         $query = $this->con->prepare(
-                'SELECT email, avatar_file_name, avatar_content_type, avatar_file_size, role, active, first_name, last_name, title, phone
+                'SELECT id, email, avatar_file_name, avatar_content_type, avatar_file_size, role, active, first_name, last_name, title, phone
                         FROM public.users',
                 array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY)
         );
@@ -193,7 +193,7 @@ class DbOperation
             return DB_ERROR;
 
         $query = $this->con->prepare(
-            'SELECT email, avatar_file_name, avatar_content_type, avatar_file_size, role, active, first_name, last_name, title, phone
+            'SELECT id, email, avatar_file_name, avatar_content_type, avatar_file_size, role, active, first_name, last_name, title, phone
                     FROM public.users  WHERE id = :id;',
             array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY)
         );

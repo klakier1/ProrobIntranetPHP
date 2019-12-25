@@ -52,18 +52,25 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 			</nav>
 		</header>
 
-		
+
 		<div class="error"></div>
 
 		<div class="container">
 			<div class="row">
-				<span class="col-md-3">Wybierz użytkownika</span>
-				<select class="col-md-4" id="userSelectorWorkTime">
-					<option value="test1">Test1</option>
+				<div class="col-md-3 offset-md-1">
+					<span class="w-100 h-100 align-middle">Wybierz użytkownika</span>
+				</div>
+				<div class="col-md-4 w-100">
+					<select id="userSelectorWorkTime" class="w-100 h-100">
+						<!-- <option value="test1">Test1</option>
 					<option value="test2">Test2</option>
 					<option value="test3">Test3</option>
-					<option value="test4">Test4</option>
-				</select>
+					<option value="test4">Test4</option> -->
+					</select>
+				</div>
+				<div class="col-md-3">
+					<button class="w-100 h-100" id="userGetWorkTime">Pobierz godziny</button>
+				</div>
 			</div>
 		</div>
 	</div>
