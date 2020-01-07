@@ -52,8 +52,7 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 			</nav>
 		</header>
 
-
-		<div class="error"></div>
+		<div class="error m-4"></div>
 
 		<div class="container">
 			<div class="row">
@@ -72,6 +71,28 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 					<button class="w-100 h-100" id="userGetWorkTime">Pobierz godziny</button>
 				</div>
 			</div>
+
+			<div id="tableContainer">
+				<!-- <table class="table table-responsive table-dark my-3" style="font-size: 14px; white-space: nowrap;">
+					<thead>
+						<tr>
+							<th scope="col" style="width: 40px">#</th>
+							<th scope="col" style="width: 140px">Data</th>
+							<th scope="col" style="width: 40px">Od</th>
+							<th scope="col" style="width: 40px">Do</th>
+							<th scope="col" style="width: 40px">Przer. klienta</th>
+							<th scope="col" style="width: 40px">Przer. ustawowa</th>
+							<th scope="col" style="width: 200px">Projekt</th>
+							<th scope="col" style="width: 100%">Komentarz</th>
+						</tr>
+					</thead>
+					<tbody id="timesheet">
+
+					</tbody>
+				</table> -->
+			</div>
+
+
 		</div>
 	</div>
 
