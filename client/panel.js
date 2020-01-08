@@ -1,3 +1,8 @@
+const months = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
+    "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
+var today = new Date();
+var fistDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+var lastDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 var currentUser = null; //dane zalogowanego uzytkownika
 var usersList = null; //dane wszystkich użytkowników - tylko dla admina
 
@@ -69,7 +74,7 @@ $(document).ready(function () {
         if (debug)
             console.log("selected id: " + id)
         $.ajax({
-            url: '../public/api/timesheet/user_id/' + id, //pobierz wszystkich uzytkownikow
+            url: `../public/api/timesheet/user_id/${id}/${formatDate(fistDayOfCurrentMonth)}/${formatDate(lastDayOfCurrentMonth)}`, //pobierz wszystkich uzytkownikow
             method: "get", //typ połączenia, domyślnie get
             contentType: 'application/x-www-form-urlencoded' //gdy wysyłamy dane czasami chcemy ustawić ich typ
         }).done(function (response) {
@@ -79,6 +84,8 @@ $(document).ready(function () {
 
                         if (debug)
                             console.log(response.data);
+                        $("#monthPickerContainer").empty();
+                        generateMonthPicker();
                         $("#tableContainer").empty();
                         generateTableHeader();
                         response.data.forEach(tsr => {
@@ -102,9 +109,24 @@ $(document).ready(function () {
         });
     })
 
+    $("userGetWorkTimeChangeMonth").click(function (event) {
+        alert(today);
+    })
+
 });
 
+function formatDate(date) {
+    var year = date.getFullYear();
+    var month = (date.getMonth() + 1).toString();
+    var day = date.getDate().toString();
 
+    if (month.length < 2)
+        month = '0' + month;
+    if (day.length < 2)
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+}
 
 function setHeader() {
     //$("header").html(`Witaj!`)
@@ -193,4 +215,85 @@ function generateTableHeader() {
 
     $("#tableContainer").append(table);
 
+}
+
+function generateMonthPicker() {
+    //     <div class="col-md-3 offset-md-1">
+    //     <span class="w-100 h-100 align-middle">Wybierz miesiąc</span>
+    // </div>
+    let divLabel = $("<div></div>").addClass("col-md-3 offset-md-1");
+    let spanLabel = $("<span></span>").addClass("w-100 h-100 align-middle");
+    spanLabel.text("Wybierz miesiąc");
+    divLabel.append(spanLabel);
+
+
+    // <div class="col-md-2 w-100 pr-md-1"> <!-- paddingRight-medium-1 ; dzieki temu jest mniejszy odstep miedzy kolumnami -->
+    //     <select id="timesheetMonthSelect" class="w-100 h-100">
+    //         <option value="01">Styczeń</option>
+    //         <option value="02">Luty</option>
+    //         <option value="03">Marzec</option>
+    //         <option value="04">Kwiecień</option>
+    //         <option value="05">Maj</option>
+    //         <option value="06">Czerwiec</option>
+    //         <option value="07">Lipiec</option>
+    //         <option value="08">Sierpień</option>
+    //         <option value="09">Wrzesień</option>
+    //         <option value="10">Październik</option>
+    //         <option value="11">Listopad</option>
+    //         <option value="12">Grudzień</option>
+    //     </select>
+    // </div>
+    let divMonth = $("<div></div>").addClass("col-md-2 w-100 pr-md-1");
+    let selectMonth = $("<select></select>").addClass("w-100 h-100");
+    selectMonth.attr('id', "timesheetMonthSelect");
+    for (let index = 0;index < months.length;index++) {
+        let optionMonth = $("<option></option>");
+        optionMonth.attr("value", index + 1);
+        optionMonth.text(months[index]);
+        if (today.getMonth() == index)
+            optionMonth.prop('selected', true);
+        selectMonth.append(optionMonth);
+    }
+    divMonth.append(selectMonth);
+
+
+    //  <div class="col-md-2 w-100 pl-md-1"> <!-- paddingLeft-medium-1 -->
+    //     <select id="timesheetYear" class="w-100 h-100">
+    //         <option value="2016">2016</option>
+    //         <option value="2017">2017</option>
+    //         <option value="2018">2018</option>
+    //         <option value="2019">2019</option>
+    //         <option value="2020">2020</option>
+    //         <option value="2021">2021</option>
+    //         <option value="2022">2022</option>
+    //         <option value="2023">2023</option>
+    //         <option value="2024">2024</option>
+    //     </select>
+    // </div>
+    let divYear = $("<div></div>").addClass("col-md-2 w-100 pl-md-1");
+    let selectYear = $("<select></select>").addClass("w-100 h-100");
+    selectYear.attr('id', "timesheetYearSelect");
+    for (let year = today.getFullYear() - 5;year < today.getFullYear() + 5;year++) {
+        let optionYear = $("<option></option>");
+        optionYear.attr("value", year);
+        optionYear.text(year);
+        if (year == today.getFullYear())
+            optionYear.prop('selected', true);
+        selectYear.append(optionYear);
+
+    }
+    divYear.append(selectYear);
+
+
+    // <div class="col-md-3">
+    //     <button class="w-100 h-100" id="userGetWorkTimeChangeMonth">Zmień</button>
+    // </div>
+    let divButtom = $("<div></div>").addClass("col-md-3");
+    let buttom = $("<button></button>").addClass("w-100 h-100");
+    buttom.attr('id', "userGetWorkTimeChangeMonth");
+    buttom.text("Zmień");
+    divButtom.append(buttom);
+
+    // append to container
+    $("#monthPickerContainer").append([divLabel, divMonth, divYear, divButtom]);
 }

@@ -272,7 +272,7 @@ $app->group('/api', function (\Slim\App $app) {
 
 	/*
 		endpoint: timesheet
-		parameters: timesheet/user_id/...
+		parameters: timesheet/user_id/[[date_from]/date_to]
 		method: GET
 	*/
 	$app->get('/timesheet[/{params:.*}]', function (Request $request, Response $response, $args) {
@@ -302,12 +302,27 @@ $app->group('/api', function (\Slim\App $app) {
 			case TOKEN_EMPLOYEE: {
 
 					/* /timesheet/id/[0-9]   -one user, all data************************************************** */
-					if (count($params) == 2 && $params[0] == 'user_id') {
+					if (count($params) >= 2 && $params[0] == 'user_id' && is_numeric($params[1])) {
 						$request_id = intval($params[1]);
 						if ($token['id'] == $request_id || $role == TOKEN_ADMIN) //admin can get any user
 						{
+							//check range of dates
+							$from = null;
+							$to = null;
+
+							try{
+								if(count($params) == 3 || count($params) == 4){
+									$from = new DateTime($params[2]);
+									if(count($params) == 4){
+										$to = new DateTime($params[3]);
+									}
+								}
+							}catch(Exception $e){
+								return $response = standardResponse($response, 400, true, "Wrong date format");
+							}
+							
 							$db = new DbOperation;
-							$result = $db->getTimesheetByUser($request_id, $ret);
+							$result = $db->getTimesheetByUser($request_id, $ret, $from, $to);
 
 							if ($result == GET_TIMESHEET_SUCCESS) {
 								return $response = standardResponse($response, 200, false, 'Get timesheet successfull', $ret);
@@ -326,6 +341,8 @@ $app->group('/api', function (\Slim\App $app) {
 			case TOKEN_ERROR: {
 					return $response = standardResponse($response, 400, true, 'Token invalid');
 				}
+
+
 		}
 	});
 

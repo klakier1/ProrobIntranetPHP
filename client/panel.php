@@ -52,10 +52,8 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 			</nav>
 		</header>
 
-		<div class="error m-4"></div>
-
-		<div class="container">
-			<div class="row">
+		<div class="container my-2">
+			<div class="row my-3" id="userPickerContainer">
 				<div class="col-md-3 offset-md-1">
 					<span class="w-100 h-100 align-middle">Wybierz użytkownika</span>
 				</div>
@@ -70,6 +68,44 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 				<div class="col-md-3">
 					<button class="w-100 h-100" id="userGetWorkTime">Pobierz godziny</button>
 				</div>
+			</div>
+
+			<div class="row my-3" id="monthPickerContainer">
+				<!-- <div class="col-md-3 offset-md-1">
+					<span class="w-100 h-100 align-middle">Wybierz miesiąc</span>
+				</div>
+				<div class="col-md-2 w-100 pr-md-1"> !-- paddingRight-medium-1 ; dzieki temu jest mniejszy odstep miedzy kolumnami 
+					<select id="timesheetMonth" class="w-100 h-100">
+						<option value="01">Styczeń</option>
+						<option value="02">Luty</option>
+						<option value="03">Marzec</option>
+						<option value="04">Kwiecień</option>
+						<option value="05">Maj</option>
+						<option value="06">Czerwiec</option>
+						<option value="07">Lipiec</option>
+						<option value="08">Sierpień</option>
+						<option value="09">Wrzesień</option>
+						<option value="10">Październik</option>
+						<option value="11">Listopad</option>
+						<option value="12">Grudzień</option>
+					</select>
+				</div>
+				 <div class="col-md-2 w-100 pl-md-1"> !-- paddingLeft-medium-1 --
+					<select id="timesheetYear" class="w-100 h-100">
+						<option value="2016">2016</option>
+						<option value="2017">2017</option>
+						<option value="2018">2018</option>
+						<option value="2019">2019</option>
+						<option value="2020">2020</option>
+						<option value="2021">2021</option>
+						<option value="2022">2022</option>
+						<option value="2023">2023</option>
+						<option value="2024">2024</option>
+					</select>
+				</div>
+				<div class="col-md-3">
+					<button class="w-100 h-100" id="userGetWorkTimeChangeMonth">Zmień</button>
+				</div> -->
 			</div>
 
 			<div id="tableContainer">
@@ -92,13 +128,15 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 				</table> -->
 			</div>
 
-
 		</div>
+
+		<div class="error m-4"></div>
 	</div>
 
 	<script src="jquery-3.4.1.js"></script>
 	<script src="jquery.cookie.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+	<!-- <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script> -->
+	<!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script> -->
 	<script src="bootstrap-4.4.1-dist/js/bootstrap.min.js"></script>
 	<script src="panel.js"></script>
 

@@ -256,7 +256,7 @@ class DbOperation
 
         $query = $this->con->prepare(
             'SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at, project
-                    FROM public.timesheets',
+                    FROM public.timesheets ORDER BY date;',
             array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY)
         );
 
@@ -272,14 +272,28 @@ class DbOperation
         }
     }
 
-    public function getTimesheetByUser($user_id, &$result)
+    public function getTimesheetByUser($user_id, &$result, DateTime $date_from = null, DateTime $date_to = null)
     {
         if ($this->con == null)
             return DB_ERROR;
 
+            // SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at, project
+            // FROM public.timesheets WHERE user_id = 2 AND date > '2019-10-11' AND date < '2019-10-13' ORDER BY date;
+        
+        $period_clasule = "";  
+        if($date_from != null){
+            
+            if($date_to != null){ //has 'from' and 'to' date
+                $period_clasule .= " AND date >= '" . $date_from->format("Y-m-d") . "'";
+                $period_clasule .= " AND date <= '" . $date_to->format("Y-m-d") . "'";
+            } else { //has only 'from' date
+                $period_clasule .= " AND date = '" . $date_from->format("Y-m-d") . "'";
+            }
+        }
+
         $query = $this->con->prepare(
             'SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at, project
-                    FROM public.timesheets WHERE user_id = :user_id;',
+                    FROM public.timesheets WHERE user_id = :user_id' . $period_clasule . ' ORDER BY date;',
             array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY)
         );
         $query->bindValue(':user_id', $user_id, PDO::PARAM_STR);
@@ -303,7 +317,7 @@ class DbOperation
 
         $query = $this->con->prepare(
             'SELECT id, user_id, date, "from", "to", customer_break, statutory_break, comments, project_id, company_id, status, created_at, updated_at, project
-                    FROM public.timesheets WHERE id = :id;',
+                    FROM public.timesheets WHERE id = :id ORDER BY date;',
             array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY)
         );
         $query->bindValue(':id', $id, PDO::PARAM_STR);
