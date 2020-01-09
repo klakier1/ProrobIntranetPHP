@@ -38,6 +38,11 @@ body
 	box-shadow: 3px 3px 30px 5px rgba(204,204,204,0.9);
 }
 
+#userPickerContainer
+{
+	font-size: 18px;
+}
+
 input[type=text],
 input[type=password],
 input[type=email]
@@ -69,6 +74,7 @@ input[type=email]:focus
 
 input[type=checkbox]
 {
+
 	font-family: 'Lato', sans-serif;
 	background-color: #efefef;
 	color: #666;

@@ -28,8 +28,8 @@ $(document).ready(function () {
                     $("#userName").text(`${currentUser.first_name} ${currentUser.last_name}`);
                     console.log(response);
 
-                    //INFLATE SPINNER
-                    let spinner = $("#userSelectorWorkTime");
+                    //POPULATE SPINNER
+                    let spinner = $("#userSelectWorkTime");
                     spinner.empty();
 
                     if (cookies.role == "admin") {
@@ -47,6 +47,8 @@ $(document).ready(function () {
                         spinner.append(item);
                     }
 
+                    populateMonthSelector("#monthSelectWorkTime");
+                    populateYearSelector("#yearSelectWorkTime");
 
                 } else {
                     $('.error').html("Brak danych użytkowników"); //nie opcji żeby się zdarzyło..
@@ -69,10 +71,20 @@ $(document).ready(function () {
         $('.error').empty();
         $("#tableContainer").empty();
 
-        let selector = $("#userSelectorWorkTime");
-        let id = selector.val();
-        if (debug)
+        let selectorUser = $("#userSelectWorkTime");
+        let selectorYear = $("#yearSelectWorkTime");
+        let selectorMonth = $("#monthSelectWorkTime");
+        let id = selectorUser.val();
+        let year = selectorYear.val();
+        let month = selectorMonth.val();
+
+        fistDayOfCurrentMonth = new Date(Number(year), Number(month), 1);
+        lastDayOfCurrentMonth = new Date(Number(year), Number(month) + 1, 0);
+
+        if (debug){
             console.log("selected id: " + id)
+            console.log(`../public/api/timesheet/user_id/${id}/${formatDate(fistDayOfCurrentMonth)}/${formatDate(lastDayOfCurrentMonth)}`)
+        }
         $.ajax({
             url: `../public/api/timesheet/user_id/${id}/${formatDate(fistDayOfCurrentMonth)}/${formatDate(lastDayOfCurrentMonth)}`, //pobierz wszystkich uzytkownikow
             method: "get", //typ połączenia, domyślnie get
@@ -84,8 +96,6 @@ $(document).ready(function () {
 
                         if (debug)
                             console.log(response.data);
-                        $("#monthPickerContainer").empty();
-                        generateMonthPicker();
                         $("#tableContainer").empty();
                         generateTableHeader();
                         response.data.forEach(tsr => {
@@ -126,6 +136,32 @@ function formatDate(date) {
         day = '0' + day;
 
     return [year, month, day].join('-');
+}
+
+function populateYearSelector(id) {
+    let selectYear = $(id);
+    selectYear.empty();
+    for (let year = today.getFullYear() - 5;year < today.getFullYear() + 5;year++) {
+        let optionYear = $("<option></option>");
+        optionYear.attr("value", year);
+        optionYear.text(year);
+        if (year == today.getFullYear())
+            optionYear.prop('selected', true);
+        selectYear.append(optionYear);
+    }
+}
+
+function populateMonthSelector(id) {
+    let selectMonth = $(id);
+    selectMonth.empty();
+    for (let index = 0;index < months.length;index++) {
+        let optionMonth = $("<option></option>");
+        optionMonth.attr("value", index);
+        optionMonth.text(months[index]);
+        if (today.getMonth() == index)
+            optionMonth.prop('selected', true);
+        selectMonth.append(optionMonth);
+    }
 }
 
 function setHeader() {
@@ -221,10 +257,10 @@ function generateMonthPicker() {
     //     <div class="col-md-3 offset-md-1">
     //     <span class="w-100 h-100 align-middle">Wybierz miesiąc</span>
     // </div>
-    let divLabel = $("<div></div>").addClass("col-md-3 offset-md-1");
-    let spanLabel = $("<span></span>").addClass("w-100 h-100 align-middle");
-    spanLabel.text("Wybierz miesiąc");
-    divLabel.append(spanLabel);
+    // let divLabel = $("<div></div>").addClass("col-md-3 offset-md-1");
+    // let spanLabel = $("<span></span>").addClass("w-100 h-100 align-middle");
+    // spanLabel.text("Wybierz miesiąc");
+    // divLabel.append(spanLabel);
 
 
     // <div class="col-md-2 w-100 pr-md-1"> <!-- paddingRight-medium-1 ; dzieki temu jest mniejszy odstep miedzy kolumnami -->
@@ -280,7 +316,6 @@ function generateMonthPicker() {
         if (year == today.getFullYear())
             optionYear.prop('selected', true);
         selectYear.append(optionYear);
-
     }
     divYear.append(selectYear);
 
@@ -288,12 +323,13 @@ function generateMonthPicker() {
     // <div class="col-md-3">
     //     <button class="w-100 h-100" id="userGetWorkTimeChangeMonth">Zmień</button>
     // </div>
-    let divButtom = $("<div></div>").addClass("col-md-3");
-    let buttom = $("<button></button>").addClass("w-100 h-100");
-    buttom.attr('id', "userGetWorkTimeChangeMonth");
-    buttom.text("Zmień");
-    divButtom.append(buttom);
+    // let divButtom = $("<div></div>").addClass("col-md-3");
+    // let buttom = $("<button></button>").addClass("w-100 h-100");
+    // buttom.attr('id', "userGetWorkTimeChangeMonth");
+    // buttom.text("Zmień");
+    // divButtom.append(buttom);
 
     // append to container
-    $("#monthPickerContainer").append([divLabel, divMonth, divYear, divButtom]);
+    //$("#monthPickerContainer").append([divLabel, divMonth, divYear, divButtom]);
+    $("#divUserSelectorWorkTime").after([divMonth, divYear]);
 }
