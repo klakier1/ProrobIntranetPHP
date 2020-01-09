@@ -51,40 +51,63 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 				</div>
 			</nav>
 		</header>
-
-		<div class="container my-2">
-			<div class="row my-3" id="userPickerContainer">
-				<div class="col-md-2 text-center">
-					<span class="w-100 h-100 align-middle">Wybierz użytkownika</span>
-				</div>
-				<div class="col-md-4 w-100 pr-md-1" id="divUserSelectorWorkTime">
-					<select id="userSelectWorkTime" class="w-100 h-100">
-						<!-- <option value="test1">Test1</option>
+		<main>
+			<div class="container my-2">
+				<div class="row mt-3" id="userPickerContainer">
+					<div class="col-md-3 col-lg-3 offset-lg-1">
+						<label class="text-center" >Wybierz użytkownika</label>
+					</div>
+					<div class="col-md-4" id="divUserSelectorWorkTime">
+						<select id="userSelectWorkTime" class="w-100 h-100">
+							<!-- <option value="test1">Test1</option>
 					<option value="test2">Test2</option>
 					<option value="test3">Test3</option>
 					<option value="test4">Test4</option> -->
-					</select>
+						</select>
+					</div>
+					<div class="col-md-4 col-lg-3">
+						<button class="w-100 h-100" id="userGetWorkTime">Pobierz godziny</button>
+					</div>
 				</div>
-				<div class="col-md-2 w-100 px-md-1">
-					<!-- paddingRight-medium-1 ; dzieki temu jest mniejszy odstep miedzy kolumnami -->
-					<select id="monthSelectWorkTime" class="w-100 h-100">
-						<!-- <option value="01">Styczeń</option>
-						<option value="12">Grudzień</option> -->
-					</select>
-				</div>
-				<div class="col-md-2 w-100 px-md-1">
-					<!-- paddingLeft-medium-1 -->
-					<select id="yearSelectWorkTime" class="w-100 h-100">
-						<!-- <option value="2016">2016</option> -->
-					</select>
-				</div>
-				<div class="col-md-2 pl-md-1">
-					<button class="w-100 h-100" id="userGetWorkTime">Pobierz godziny</button>
-				</div>
-			</div>
 
-			<div id="tableContainer">
-				<!-- <table class="table table-responsive table-dark my-3" style="font-size: 14px; white-space: nowrap;">
+				<div class="row mt-2" id="timeSelectWeek">
+					<div class="col-md-3 col-lg-2 offset-lg-1 my-auto">
+						<input type="radio" id="timeRangeWeek" name="timeRange" value="week">
+						<label for="timeRangeWeek">Tydzień</label>
+					</div>
+					<div class="col-md-4">
+						<input type="week" id="inputWeek" value="2020-W05" required>
+					</div>
+				</div>
+
+				<div class="row mt-2" id="timeSelectMonth">
+					<div class="col-md-3 col-lg-2 offset-lg-1 my-auto">
+						<input type="radio" id="timeRangeMonth" name="timeRange" value="month" checked>
+						<label for="timeRangeMonth">Miesiąc</label>
+					</div>
+					<div class="col-md-4">
+						<input type="month" id="inputMonth" value="2020-05" required>
+					</div>
+				</div>
+
+				<div class="row mt-2" id="timeSelectDateToDate">
+					<div class="col-md-3 col-lg-2 offset-lg-1 my-auto">
+						<input type="radio" id="timeRangePeriod" name="timeRange" value="period">
+						<label for="timeRangePeriod">Okres</label>
+					</div>
+					<div class="col-md-4" style="display: flex;">
+						<label class="text-center" for="inputPeriodFrom" style="flex: 0.15">Od</label>
+						<input type="date" style="flex: 0.85" id="inputPeriodFrom" value="2020-05-01" required>
+
+					</div>
+					<div class="col-md-4" style="display: flex;">
+						<label class="text-center" for="inputPeriodTo" style="flex: 0.15">Do</label>
+						<input type="date" style="flex: 0.85" id="inputPeriodTo" value="2020-06-30" required>
+					</div>
+				</div>
+
+				<div id="tableContainer">
+					<!-- <table class="table table-responsive table-dark my-3" style="font-size: 14px; white-space: nowrap;">
 					<thead>
 						<tr>
 							<th scope="col" style="width: 40px">#</th>
@@ -101,11 +124,12 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 
 					</tbody>
 				</table> -->
+				</div>
+
 			</div>
 
-		</div>
-
-		<div class="error m-4"></div>
+			<div class="error m-4"></div>
+		</main>
 	</div>
 
 	<script src="jquery-3.4.1.js"></script>
