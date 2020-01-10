@@ -1,5 +1,6 @@
 const months = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
-    "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
+    "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
+];
 var today = new Date();
 var fistDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 var lastDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -10,14 +11,14 @@ var debug = true;
 
 const cookies = $.cookie();
 
-$(document).ready(function () {
+$(document).ready(function() {
 
     $.ajax({
         url: '../public/api/user/', //pobierz wszystkich uzytkownikow
         method: "get", //typ połączenia, domyślnie get
         contentType: 'application/x-www-form-urlencoded', //gdy wysyłamy dane czasami chcemy ustawić ich typ
         dataType: "json"
-    }).done(function (response) {
+    }).done(function(response) {
         if (response != null) {
             if (response.error == false) {
                 if (response.data_length > 0) {
@@ -60,14 +61,14 @@ $(document).ready(function () {
             $('.error').html("Brak odpowiedzi serwera");
         }
 
-    }).fail(function (arg) {
+    }).fail(function(arg) {
         if (typeof arg.responseJSON !== "undefined")
             $('.error').html(arg.responseJSON.message);
         else
             $('.error').html("Brak odpowiedzi serwera");
     });
 
-    $("#userGetWorkTime").click(function (event) {
+    $("#userGetWorkTime").click(function(event) {
         $('.error').empty();
         $("#tableContainer").empty();
 
@@ -81,7 +82,7 @@ $(document).ready(function () {
         fistDayOfCurrentMonth = new Date(Number(year), Number(month), 1);
         lastDayOfCurrentMonth = new Date(Number(year), Number(month) + 1, 0);
 
-        if (debug){
+        if (debug) {
             console.log("selected id: " + id)
             console.log(`../public/api/timesheet/user_id/${id}/${formatDate(fistDayOfCurrentMonth)}/${formatDate(lastDayOfCurrentMonth)}`)
         }
@@ -89,7 +90,7 @@ $(document).ready(function () {
             url: `../public/api/timesheet/user_id/${id}/${formatDate(fistDayOfCurrentMonth)}/${formatDate(lastDayOfCurrentMonth)}`, //pobierz wszystkich uzytkownikow
             method: "get", //typ połączenia, domyślnie get
             contentType: 'application/x-www-form-urlencoded' //gdy wysyłamy dane czasami chcemy ustawić ich typ
-        }).done(function (response) {
+        }).done(function(response) {
             if (response != null) {
                 if (response.error == false) {
                     if (response.data_length > 0) {
@@ -111,7 +112,7 @@ $(document).ready(function () {
             } else {
                 $('.error').html("Brak odpowiedzi serwera");
             }
-        }).fail(function (arg) {
+        }).fail(function(arg) {
             if (typeof arg.responseJSON !== "undefined")
                 $('.error').html(arg.responseJSON.message);
             else
@@ -119,11 +120,31 @@ $(document).ready(function () {
         });
     })
 
-    $("userGetWorkTimeChangeMonth").click(function (event) {
+    $("userGetWorkTimeChangeMonth").click(function(event) {
         alert(today);
     })
 
 });
+
+function getPeriodOfTime(range) {
+    var selected = $("input[type='radio'][name='timeRange']:checked").val();
+    switch (selected) {
+        case "week":
+            range.start = $('#inputPeriodFrom').val();
+            range.end = 345;
+            break;
+        case "month":
+            range.start = 43364321;
+            range.end = $('#inputPeriodTo').val();
+            break;
+        case "period":
+            range.start = $('#inputPeriodFrom').val();
+            range.end = $('#inputPeriodTo').val();
+            break;
+        default:
+            break;
+    }
+}
 
 function formatDate(date) {
     var year = date.getFullYear();
@@ -141,7 +162,7 @@ function formatDate(date) {
 function populateYearSelector(id) {
     let selectYear = $(id);
     selectYear.empty();
-    for (let year = today.getFullYear() - 5;year < today.getFullYear() + 5;year++) {
+    for (let year = today.getFullYear() - 5; year < today.getFullYear() + 5; year++) {
         let optionYear = $("<option></option>");
         optionYear.attr("value", year);
         optionYear.text(year);
@@ -154,7 +175,7 @@ function populateYearSelector(id) {
 function populateMonthSelector(id) {
     let selectMonth = $(id);
     selectMonth.empty();
-    for (let index = 0;index < months.length;index++) {
+    for (let index = 0; index < months.length; index++) {
         let optionMonth = $("<option></option>");
         optionMonth.attr("value", index);
         optionMonth.text(months[index]);
@@ -282,7 +303,7 @@ function generateMonthPicker() {
     let divMonth = $("<div></div>").addClass("col-md-2 w-100 pr-md-1");
     let selectMonth = $("<select></select>").addClass("w-100 h-100");
     selectMonth.attr('id', "timesheetMonthSelect");
-    for (let index = 0;index < months.length;index++) {
+    for (let index = 0; index < months.length; index++) {
         let optionMonth = $("<option></option>");
         optionMonth.attr("value", index + 1);
         optionMonth.text(months[index]);
@@ -309,7 +330,7 @@ function generateMonthPicker() {
     let divYear = $("<div></div>").addClass("col-md-2 w-100 pl-md-1");
     let selectYear = $("<select></select>").addClass("w-100 h-100");
     selectYear.attr('id', "timesheetYearSelect");
-    for (let year = today.getFullYear() - 5;year < today.getFullYear() + 5;year++) {
+    for (let year = today.getFullYear() - 5; year < today.getFullYear() + 5; year++) {
         let optionYear = $("<option></option>");
         optionYear.attr("value", year);
         optionYear.text(year);

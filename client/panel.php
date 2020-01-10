@@ -55,7 +55,7 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 			<div class="container my-2">
 				<div class="row mt-3" id="userPickerContainer">
 					<div class="col-md-3 col-lg-3 offset-lg-1">
-						<label class="text-center" >Wybierz użytkownika</label>
+						<label class="text-center">Wybierz użytkownika</label>
 					</div>
 					<div class="col-md-4" id="divUserSelectorWorkTime">
 						<select id="userSelectWorkTime" class="w-100 h-100">
@@ -128,7 +128,7 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 
 			</div>
 
-			<div class="error m-4"></div>
+			<div class="error m-3"></div>
 		</main>
 	</div>
 
@@ -138,6 +138,7 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 	<!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script> -->
 	<script src="bootstrap-4.4.1-dist/js/bootstrap.min.js"></script>
 	<script src="panel.js"></script>
+	<script src=" https://MomentJS.com/downloads/moment.js"></script>
 
 </body>
 
