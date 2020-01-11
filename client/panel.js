@@ -1,9 +1,13 @@
+//const moment = require("moment");
+
 const months = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
     "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
 ];
 var today = new Date();
-var fistDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-var lastDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+var range = {
+    start: moment().startOf('month').format('YYYY-MM-DD'),
+    end: moment().endOf('month').format('YYYY-MM-DD')
+}
 var currentUser = null; //dane zalogowanego uzytkownika
 var usersList = null; //dane wszystkich użytkowników - tylko dla admina
 
@@ -11,14 +15,20 @@ var debug = true;
 
 const cookies = $.cookie();
 
-$(document).ready(function() {
+//initial values
+$("#inputPeriodFrom").val(moment().startOf('month').format('YYYY-MM-DD'));
+$("#inputPeriodTo").val(moment().endOf('month').format('YYYY-MM-DD'));
+$("#inputMonth").val(moment().format('YYYY-MM'));
+$("#inputWeek").val(moment().format('YYYY-[W]WW'))
+
+$(document).ready(function () {
 
     $.ajax({
         url: '../public/api/user/', //pobierz wszystkich uzytkownikow
         method: "get", //typ połączenia, domyślnie get
         contentType: 'application/x-www-form-urlencoded', //gdy wysyłamy dane czasami chcemy ustawić ich typ
         dataType: "json"
-    }).done(function(response) {
+    }).done(function (response) {
         if (response != null) {
             if (response.error == false) {
                 if (response.data_length > 0) {
@@ -48,9 +58,6 @@ $(document).ready(function() {
                         spinner.append(item);
                     }
 
-                    populateMonthSelector("#monthSelectWorkTime");
-                    populateYearSelector("#yearSelectWorkTime");
-
                 } else {
                     $('.error').html("Brak danych użytkowników"); //nie opcji żeby się zdarzyło..
                 }
@@ -61,36 +68,31 @@ $(document).ready(function() {
             $('.error').html("Brak odpowiedzi serwera");
         }
 
-    }).fail(function(arg) {
+    }).fail(function (arg) {
         if (typeof arg.responseJSON !== "undefined")
             $('.error').html(arg.responseJSON.message);
         else
             $('.error').html("Brak odpowiedzi serwera");
     });
 
-    $("#userGetWorkTime").click(function(event) {
+    $("#userGetWorkTime").click(function (event) {
         $('.error').empty();
         $("#tableContainer").empty();
 
         let selectorUser = $("#userSelectWorkTime");
-        let selectorYear = $("#yearSelectWorkTime");
-        let selectorMonth = $("#monthSelectWorkTime");
         let id = selectorUser.val();
-        let year = selectorYear.val();
-        let month = selectorMonth.val();
 
-        fistDayOfCurrentMonth = new Date(Number(year), Number(month), 1);
-        lastDayOfCurrentMonth = new Date(Number(year), Number(month) + 1, 0);
+        getPeriodOfTime(range);
 
         if (debug) {
             console.log("selected id: " + id)
-            console.log(`../public/api/timesheet/user_id/${id}/${formatDate(fistDayOfCurrentMonth)}/${formatDate(lastDayOfCurrentMonth)}`)
+            console.log(`../public/api/timesheet/user_id/${id}/${range.start}/${range.end}`)
         }
         $.ajax({
-            url: `../public/api/timesheet/user_id/${id}/${formatDate(fistDayOfCurrentMonth)}/${formatDate(lastDayOfCurrentMonth)}`, //pobierz wszystkich uzytkownikow
+            url: `../public/api/timesheet/user_id/${id}/${range.start}/${range.end}`, //pobierz wszystkich uzytkownikow
             method: "get", //typ połączenia, domyślnie get
             contentType: 'application/x-www-form-urlencoded' //gdy wysyłamy dane czasami chcemy ustawić ich typ
-        }).done(function(response) {
+        }).done(function (response) {
             if (response != null) {
                 if (response.error == false) {
                     if (response.data_length > 0) {
@@ -112,7 +114,7 @@ $(document).ready(function() {
             } else {
                 $('.error').html("Brak odpowiedzi serwera");
             }
-        }).fail(function(arg) {
+        }).fail(function (arg) {
             if (typeof arg.responseJSON !== "undefined")
                 $('.error').html(arg.responseJSON.message);
             else
@@ -120,22 +122,39 @@ $(document).ready(function() {
         });
     })
 
-    $("userGetWorkTimeChangeMonth").click(function(event) {
-        alert(today);
-    })
+    $("input[name='timeRange']").change(function (event) {
+        if ($("#timeRangeWeek").prop('checked') == true) {
+            $("#inputWeek").prop('disabled', false);
+        } else {
+            $("#inputWeek").prop('disabled', true);
+        }
 
+        if ($("#timeRangeMonth").prop('checked') == true) {
+            $("#inputMonth").prop('disabled', false);
+        } else {
+            $("#inputMonth").prop('disabled', true);
+        }
+
+        if ($("#timeRangePeriod").prop('checked') == true) {
+            $("#inputPeriodFrom").prop('disabled', false);
+            $("#inputPeriodTo").prop('disabled', false);
+        } else {
+            $("#inputPeriodFrom").prop('disabled', true);
+            $("#inputPeriodTo").prop('disabled', true);
+        }
+    })
 });
 
 function getPeriodOfTime(range) {
     var selected = $("input[type='radio'][name='timeRange']:checked").val();
     switch (selected) {
         case "week":
-            range.start = $('#inputPeriodFrom').val();
-            range.end = 345;
+            range.start = moment($('#inputWeek').val()).startOf('week').format('YYYY-MM-DD');
+            range.end = moment($('#inputWeek').val()).endOf('week').format('YYYY-MM-DD');
             break;
         case "month":
-            range.start = 43364321;
-            range.end = $('#inputPeriodTo').val();
+            range.start = moment($('#inputMonth').val()).startOf('month').format('YYYY-MM-DD');
+            range.end = moment($('#inputMonth').val()).endOf('month').format('YYYY-MM-DD');
             break;
         case "period":
             range.start = $('#inputPeriodFrom').val();
@@ -159,31 +178,31 @@ function formatDate(date) {
     return [year, month, day].join('-');
 }
 
-function populateYearSelector(id) {
-    let selectYear = $(id);
-    selectYear.empty();
-    for (let year = today.getFullYear() - 5; year < today.getFullYear() + 5; year++) {
-        let optionYear = $("<option></option>");
-        optionYear.attr("value", year);
-        optionYear.text(year);
-        if (year == today.getFullYear())
-            optionYear.prop('selected', true);
-        selectYear.append(optionYear);
-    }
-}
+// function populateYearSelector(id) {
+//     let selectYear = $(id);
+//     selectYear.empty();
+//     for (let year = today.getFullYear() - 5; year < today.getFullYear() + 5; year++) {
+//         let optionYear = $("<option></option>");
+//         optionYear.attr("value", year);
+//         optionYear.text(year);
+//         if (year == today.getFullYear())
+//             optionYear.prop('selected', true);
+//         selectYear.append(optionYear);
+//     }
+// }
 
-function populateMonthSelector(id) {
-    let selectMonth = $(id);
-    selectMonth.empty();
-    for (let index = 0; index < months.length; index++) {
-        let optionMonth = $("<option></option>");
-        optionMonth.attr("value", index);
-        optionMonth.text(months[index]);
-        if (today.getMonth() == index)
-            optionMonth.prop('selected', true);
-        selectMonth.append(optionMonth);
-    }
-}
+// function populateMonthSelector(id) {
+//     let selectMonth = $(id);
+//     selectMonth.empty();
+//     for (let index = 0; index < months.length; index++) {
+//         let optionMonth = $("<option></option>");
+//         optionMonth.attr("value", index);
+//         optionMonth.text(months[index]);
+//         if (today.getMonth() == index)
+//             optionMonth.prop('selected', true);
+//         selectMonth.append(optionMonth);
+//     }
+// }
 
 function setHeader() {
     //$("header").html(`Witaj!`)

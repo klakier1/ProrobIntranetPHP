@@ -76,7 +76,7 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 						<label for="timeRangeWeek">Tydzień</label>
 					</div>
 					<div class="col-md-4">
-						<input type="week" id="inputWeek" value="2020-W05" required>
+						<input type="week" id="inputWeek" value="2020-W05" required disabled>
 					</div>
 				</div>
 
@@ -97,12 +97,12 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 					</div>
 					<div class="col-md-4" style="display: flex;">
 						<label class="text-center" for="inputPeriodFrom" style="flex: 0.15">Od</label>
-						<input type="date" style="flex: 0.85" id="inputPeriodFrom" value="2020-05-01" required>
+						<input type="date" style="flex: 0.85" id="inputPeriodFrom" value="2020-05-01" required disabled>
 
 					</div>
 					<div class="col-md-4" style="display: flex;">
 						<label class="text-center" for="inputPeriodTo" style="flex: 0.15">Do</label>
-						<input type="date" style="flex: 0.85" id="inputPeriodTo" value="2020-06-30" required>
+						<input type="date" style="flex: 0.85" id="inputPeriodTo" value="2020-06-30" required disabled>
 					</div>
 				</div>
 
@@ -134,11 +134,12 @@ if (!isset($_COOKIE['token']) || !isset($_COOKIE['id'])) {
 
 	<script src="jquery-3.4.1.js"></script>
 	<script src="jquery.cookie.js"></script>
-	<!-- <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script> -->
-	<!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script> -->
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 	<script src="bootstrap-4.4.1-dist/js/bootstrap.min.js"></script>
+	<script src="https://MomentJS.com/downloads/moment.js"></script>
 	<script src="panel.js"></script>
-	<script src=" https://MomentJS.com/downloads/moment.js"></script>
+
 
 </body>
 

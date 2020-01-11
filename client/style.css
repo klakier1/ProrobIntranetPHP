@@ -57,6 +57,11 @@ main button {
     margin-top: 10px;
 }
 
+input:disabled {
+    background: #dddddd;
+    color: #bbbbbb;
+  }
+
 main input,
 main select,
 main button {

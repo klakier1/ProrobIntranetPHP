@@ -9,7 +9,8 @@
   "dependencies": {
     "@types/jquery": "^3.3.31",
     "@types/jquery.cookie": "^1.4.31",
-    "@types/jqueryui": "^1.12.10"
+    "@types/jqueryui": "^1.12.10",
+    "@types/moment": "^2.13.0"
   },
   "devDependencies": {},
   "scripts": {
