@@ -1,6 +1,7 @@
 :root {
     --primary-color: #f58220;
     --primary-color-ligth: #ffb352;
+    --primary-color-very-ligth: #ffcb86;
     --primary-color-dark: #bc5400;
     --primary-color-very-dark: #8f402088;
 }
@@ -60,12 +61,13 @@ main button {
 input:disabled {
     background: #dddddd;
     color: #bbbbbb;
-  }
+}
 
 main input,
 main select,
 main button {
     padding: 0px !important;
+    padding-left: 3px !important;
     margin: 0px !important;
 }
 
@@ -73,6 +75,22 @@ main label,
 span {
     margin-top: auto;
     margin-bottom: auto;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+}
+
+option:focus,
+input::-webkit-datetime-edit-week-field:focus,
+input::-webkit-datetime-edit-day-field:focus,
+input::-webkit-datetime-edit-month-field:focus,
+input::-webkit-datetime-edit-year-field:focus {
+    background-color: var(--primary-color-very-ligth);
+    color: white;
 }
 
 input[type=text]:focus,
@@ -228,6 +246,10 @@ label {
 
 nav {
     background-color: black;
+}
+
+::selection {
+    background: var(--primary-color-very-ligth);
 }
 
 
