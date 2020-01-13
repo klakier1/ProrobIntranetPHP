@@ -15,6 +15,9 @@ require '../includes/responseProcess.php';
 require '../includes/dbOperation.php';
 require '../includes/token.php';
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 use Klakier\ErrorHandlerProvider;
 use Klakier\PageNotFoundHandler;
 use Klakier\YamlUtils;
@@ -28,8 +31,6 @@ use Symfony\Component\Yaml\Tag\TaggedValue;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
-use Slim\Views\PhpRenderer;
-
 $app = new \Slim\App([
 	// 'settings' => [
 	// 	'displayErrorDetails' => true
@@ -40,7 +41,6 @@ $container = $app->getContainer();
 $container['phpErrorHandler'] = new ErrorHandlerProvider();
 $container['errorHandler'] = new ErrorHandlerProvider();
 $container['notFoundHandler'] = new PageNotFoundHandler();
-$container['renderer'] = new PhpRenderer("../client");
 
 // Register middleware
 require '../src/middleware.php';
@@ -50,13 +50,23 @@ require '../src/middleware.php';
 	$response->getBody()->write("Hello, $name");
 }); */
 
-/* $app->get('/test', function (Request $request, Response $response, array $args) {
+$app->get('/test', function (Request $request, Response $response, array $args) {
 
-	$value = Yaml::parseFile('test2.yml', Yaml::PARSE_CUSTOM_TAGS);
-	$val = YamlUtils::taggedValueToArray($value);
-	$val = Yaml::parseFile('test2.yml');
-	return $response = standardResponse($response, 200, false, 'Yaml parsing test', ['data' => $val]);
-}); */
+	$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load('../client/templates/template_week.xlsx');
+
+	$worksheet = $spreadsheet->getActiveSheet();
+
+	$worksheet->getCell('A1')->setValue('John');
+	$worksheet->getCell('A2')->setValue('Smith');
+
+	$writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xls');
+	$writer->save('write.xls');
+
+	// $value = Yaml::parseFile('test2.yml', Yaml::PARSE_CUSTOM_TAGS);
+	// $val = YamlUtils::taggedValueToArray($value);
+	// $val = Yaml::parseFile('test2.yml');
+	// return $response = standardResponse($response, 200, false, 'Yaml parsing test', ['data' => $val]);
+});
 
 /*
 	endpoint: login

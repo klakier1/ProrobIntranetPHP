@@ -21,14 +21,14 @@ $("#inputPeriodTo").val(moment().endOf('month').format('YYYY-MM-DD'));
 $("#inputMonth").val(moment().format('YYYY-MM'));
 $("#inputWeek").val(moment().format('YYYY-[W]WW'))
 
-$(document).ready(function () {
+$(document).ready(function() {
 
     $.ajax({
         url: '../public/api/user/', //pobierz wszystkich uzytkownikow
         method: "get", //typ połączenia, domyślnie get
         contentType: 'application/x-www-form-urlencoded', //gdy wysyłamy dane czasami chcemy ustawić ich typ
         dataType: "json"
-    }).done(function (response) {
+    }).done(function(response) {
         if (response != null) {
             if (response.error == false) {
                 if (response.data_length > 0) {
@@ -68,14 +68,14 @@ $(document).ready(function () {
             $('.error').html("Brak odpowiedzi serwera");
         }
 
-    }).fail(function (arg) {
+    }).fail(function(arg) {
         if (typeof arg.responseJSON !== "undefined")
             $('.error').html(arg.responseJSON.message);
         else
             $('.error').html("Brak odpowiedzi serwera");
     });
 
-    $("#userGetWorkTime").click(function (event) {
+    $("#userGetWorkTime").click(function(event) {
         $('.error').empty();
         $("#tableContainer").empty();
 
@@ -92,7 +92,7 @@ $(document).ready(function () {
             url: `../public/api/timesheet/user_id/${id}/${range.start}/${range.end}`, //pobierz wszystkich uzytkownikow
             method: "get", //typ połączenia, domyślnie get
             contentType: 'application/x-www-form-urlencoded' //gdy wysyłamy dane czasami chcemy ustawić ich typ
-        }).done(function (response) {
+        }).done(function(response) {
             if (response != null) {
                 if (response.error == false) {
                     if (response.data_length > 0) {
@@ -114,7 +114,7 @@ $(document).ready(function () {
             } else {
                 $('.error').html("Brak odpowiedzi serwera");
             }
-        }).fail(function (arg) {
+        }).fail(function(arg) {
             if (typeof arg.responseJSON !== "undefined")
                 $('.error').html(arg.responseJSON.message);
             else
@@ -122,7 +122,7 @@ $(document).ready(function () {
         });
     })
 
-    $("input[name='timeRange']").change(function (event) {
+    $("input[name='timeRange']").change(function(event) {
         if ($("#timeRangeWeek").prop('checked') == true) {
             $("#inputWeek").prop('disabled', false);
         } else {
@@ -143,6 +143,7 @@ $(document).ready(function () {
             $("#inputPeriodTo").prop('disabled', true);
         }
     })
+
 });
 
 function getPeriodOfTime(range) {
@@ -158,8 +159,6 @@ function getPeriodOfTime(range) {
             break;
         case "period":
             range.start = $('#inputPeriodFrom').val();
-            range.end = $('#inputPeriodTo').val();
-            break;
         default:
             break;
     }

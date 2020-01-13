@@ -1,6 +1,18 @@
 {
+    "markbaker/complex": {
+        "version": "1.4.7"
+    },
+    "markbaker/matrix": {
+        "version": "1.2.0"
+    },
     "php": {
         "version": "7.3"
+    },
+    "phpoffice/phpspreadsheet": {
+        "version": "1.10.1"
+    },
+    "psr/simple-cache": {
+        "version": "1.0.1"
     },
     "symfony/flex": {
         "version": "1.0",
