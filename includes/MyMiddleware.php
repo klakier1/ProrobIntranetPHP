@@ -5,14 +5,15 @@ namespace Klakier;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+//checks if token version is OK and adds attribute with role
 final class MyMiddleware
 {
-    private $allowedPath = "/";
+    private $allowedPaths = ["/"];
 
     public function __construct(array $options = [])
     {
         if (isset($options["path"])) {
-            $this->allowedPath = $options["path"];
+            $this->allowedPaths = $options["path"];
         }
     }
 
@@ -28,7 +29,16 @@ final class MyMiddleware
         if ($request->getUri()->getPath()[0] != "/")
             $path = "/" . $path;
 
-        if (strpos($path, $this->allowedPath) === 0) {
+        $shouldProcess = false;
+
+        foreach ($this->allowedPaths as $allowedPath) {
+            if (strpos($path, $this->allowedPath) === 0) {
+                $shouldProcess = true;
+                break;
+            }
+        }
+
+        if ($shouldProcess) {
             $token = $request->getAttribute("decoded_token_data");
             $role = checkTokenData($token);
             if ($role == TOKEN_ADMIN || $role == TOKEN_EMPLOYEE) {

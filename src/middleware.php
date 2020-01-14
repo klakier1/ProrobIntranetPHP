@@ -3,12 +3,12 @@
 use Slim\App;
 
 $app->add(new \Klakier\MyMiddleware([
-    "path" => "/api"
+    "path" => ["/api", "/generate"]
 ]));
 
 $app->add(new \Tuupola\Middleware\JwtAuthentication([
     "secure" => false,
-    "path" => "/api", /* or ["/api", "/admin"] */
+    "path" => ["/api", "/generate"], /* or ["/api", "/admin"] */
     "attribute" => "decoded_token_data",
     "secret" => getenv("JWT_SECRET"),
     "algorithm" => ["HS256"],

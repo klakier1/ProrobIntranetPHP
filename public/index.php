@@ -17,6 +17,7 @@ require '../includes/token.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Shared\File;
 
 use Klakier\ErrorHandlerProvider;
 use Klakier\PageNotFoundHandler;
@@ -52,15 +53,35 @@ require '../src/middleware.php';
 
 $app->get('/test', function (Request $request, Response $response, array $args) {
 
-	$spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load('../client/templates/template_week.xlsx');
+	$locale = 'pl';
+	$validLocale = \PhpOffice\PhpSpreadsheet\Settings::setLocale($locale);
+	if (!$validLocale) {
+		echo 'Unable to set locale to ' . $locale . " - reverting to en_us<br />\n";
+	}
+	$internalFormula = \PhpOffice\PhpSpreadsheet\Calculation\Calculation::getInstance();
 
+
+	$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
+	$spreadsheet = $reader->load('../client/templates/template_week.xls');
 	$worksheet = $spreadsheet->getActiveSheet();
 
-	$worksheet->getCell('A1')->setValue('John');
-	$worksheet->getCell('A2')->setValue('Smith');
+	$worksheet->getCell('C3')->setValue('John');
+	$worksheet->getCell('C5')->setValue('Doe');
+	$worksheet->setCellValue('C7', '=NUM.TYG(C9;2)');
 
-	$writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xls');
-	$writer->save('write.xls');
+
+	$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xls($spreadsheet);
+	$tempFile = tempnam(File::sysGetTempDir(), 'phpxltmp');
+	$tempFile = $tempFile ?: __DIR__ . '/temp.xls';
+	$writer->save($tempFile);
+
+
+	$response = $response->withHeader('Content-Type', 'application/vnd.ms-excel');
+	$response = $response->withHeader('Content-Disposition', 'attachment; filename="file.xls"');
+
+	$stream = fopen($tempFile, 'r+');
+
+	return $response->withBody(new \Slim\Http\Stream($stream));
 
 	// $value = Yaml::parseFile('test2.yml', Yaml::PARSE_CUSTOM_TAGS);
 	// $val = YamlUtils::taggedValueToArray($value);
@@ -320,17 +341,17 @@ $app->group('/api', function (\Slim\App $app) {
 							$from = null;
 							$to = null;
 
-							try{
-								if(count($params) == 3 || count($params) == 4){
+							try {
+								if (count($params) == 3 || count($params) == 4) {
 									$from = new DateTime($params[2]);
-									if(count($params) == 4){
+									if (count($params) == 4) {
 										$to = new DateTime($params[3]);
 									}
 								}
-							}catch(Exception $e){
+							} catch (Exception $e) {
 								return $response = standardResponse($response, 400, true, "Wrong date format");
 							}
-							
+
 							$db = new DbOperation;
 							$result = $db->getTimesheetByUser($request_id, $ret, $from, $to);
 
@@ -351,8 +372,6 @@ $app->group('/api', function (\Slim\App $app) {
 			case TOKEN_ERROR: {
 					return $response = standardResponse($response, 400, true, 'Token invalid');
 				}
-
-
 		}
 	});
 
@@ -711,6 +730,15 @@ $app->group('/api', function (\Slim\App $app) {
 		return $response = standardResponse($response, 200, false, 'Echo ok');
 	}); */
 });
+
+$app->group('/generate', function (\Slim\App $app) {
+	$app->group('/timesheet', function (\Slim\App $app) {
+		$app->get('/id/{id}/cw/{cw}', function (Request $request, Response $response, $args) {
+			
+		});
+	});
+});
+
 
 function haveEmptyParameters($required_params, Request $request, Response &$response)
 {
