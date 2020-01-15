@@ -31,6 +31,7 @@ use Symfony\Component\Yaml\Tag\TaggedValue;
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use phpDocumentor\Reflection\Types\Array_;
 
 $app = new \Slim\App([
 	// 'settings' => [
@@ -51,20 +52,29 @@ require '../src/middleware.php';
 	$response->getBody()->write("Hello, $name");
 }); */
 
-$app->get('/test', function (Request $request, Response $response, array $args) {
+$app->get('/test/{date}', function (Request $request, Response $response, array $args) {
+
+
+
+	$time = new \Moment\Moment($args['date']);
+	echo $time->startOf('week')->format('Y-m-d');
+	echo "<br>";
+	echo $time->endOf('week')->format('Y-m-d');
+	echo "<br>";
+	echo $time->format('W');
+	
+	return;
 
 	$locale = 'pl';
 	$validLocale = \PhpOffice\PhpSpreadsheet\Settings::setLocale($locale);
 	if (!$validLocale) {
-		echo 'Unable to set locale to ' . $locale . " - reverting to en_us<br />\n";
+		throw new Exception('Unable to set locale to ' . $locale . " - reverting to en_us");
 	}
-	$internalFormula = \PhpOffice\PhpSpreadsheet\Calculation\Calculation::getInstance();
 
 
 	$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
 	$spreadsheet = $reader->load('../client/templates/template_week.xls');
 	$worksheet = $spreadsheet->getActiveSheet();
-
 	$worksheet->getCell('C3')->setValue('John');
 	$worksheet->getCell('C5')->setValue('Doe');
 	$worksheet->setCellValue('C7', '=NUM.TYG(C9;2)');
@@ -74,7 +84,6 @@ $app->get('/test', function (Request $request, Response $response, array $args) 
 	$tempFile = tempnam(File::sysGetTempDir(), 'phpxltmp');
 	$tempFile = $tempFile ?: __DIR__ . '/temp.xls';
 	$writer->save($tempFile);
-
 
 	$response = $response->withHeader('Content-Type', 'application/vnd.ms-excel');
 	$response = $response->withHeader('Content-Disposition', 'attachment; filename="file.xls"');
@@ -733,8 +742,90 @@ $app->group('/api', function (\Slim\App $app) {
 
 $app->group('/generate', function (\Slim\App $app) {
 	$app->group('/timesheet', function (\Slim\App $app) {
-		$app->get('/id/{id}/cw/{cw}', function (Request $request, Response $response, $args) {
+		$app->get('/id/{id}/cw/{dateInCw}', function (Request $request, Response $response, $args) {
+			$token = $request->getAttribute("decoded_token_data");
+			$role = $request->getAttribute("role");
+
+			//verification
+			$verified = false;
+			if ($role == TOKEN_ADMIN) {
+				$verified = true;
+			} else if ($role == TOKEN_EMPLOYEE) {
+				if ($args['id'] == $token['id'])
+					$verified = true;
+			}
+
+			if ($verified) {
+				//get range of dates
+				$moment = new \Moment\Moment($args['dateInCw']);
+				$period = array();
+				$period['start'] = new DateTime($moment->startOf('week')->format('Y-m-d'));
+				$period['end'] = new DateTime($moment->endOf('week')->format('Y-m-d'));
+
+				//fetch data
+				$db = new DbOperation;
+				$result = $db->getTimesheetByUser($args['id'], $timesheetData, $period['start'], $period['end']);
+				if ($result != GET_TIMESHEET_SUCCESS)
+					throw new Exception("Failed loading timesheet data for XLS");
+				//echo json_encode($timesheetData);
+				//fetch user
+				$result = $db->getUserShort($args['id'], $userData);
+				if ($result != GET_USERS_SUCCESS)
+					throw new Exception("Failed loading user data for XLS");
+				$user = $userData['data'][0];
+				//echo "<br><br><br><br>";
+				//echo json_encode($userData);
+
+				$locale = 'pl';
+				$validLocale = \PhpOffice\PhpSpreadsheet\Settings::setLocale($locale);
+				if (!$validLocale) {
+					throw new Exception('Unable to set locale to ' . $locale . " - reverting to en_us");
+				}
+
+				$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
+				$spreadsheet = $reader->load('../client/templates/template_week.xls');
+				$worksheet = $spreadsheet->getActiveSheet();
+				$worksheet->getCell('C3')->setValue($user['first_name']);
+				$worksheet->getCell('C5')->setValue($user['last_name']);
+				$worksheet->getCell('C7')->setValue($period['start']->format('W'));
+				$worksheet->getCell('C9')->setValue($period['start']->format('Y-m-d'));
+				$worksheet->getCell('E9')->setValue($period['end']->format('Y-m-d'));
+				//$worksheet->setCellValue('C7', '=NUM.TYG(C9;2)');
+
+
+				$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xls($spreadsheet);
+				$tempFile = tempnam(File::sysGetTempDir(), 'phpxltmp');
+				$tempFile = $tempFile ?: __DIR__ . '/temp.xls';
+				$writer->save($tempFile);
+
+				$response = $response->withHeader('Content-Type', 'application/vnd.ms-excel');
+				$response = $response->withHeader('Content-Disposition', 'attachment; filename="file.xls"');
+
+				$stream = fopen($tempFile, 'r+');
+
+				return $response->withBody(new \Slim\Http\Stream($stream));
+			} else {
+				return $response = standardResponse($response, 401, true, 'Verification failed');
+			}
+
+			// $m = new \Moment\Moment('2013-10-23T10:00:00');
+			// $momentPeriodVo = $m->getPeriod('week');
 			
+			// // results comes as well as a value object class
+			// echo $momentPeriodVo
+			// 	->getStartDate()
+			// 	->format('Y-m-d'); // 2013-10-21
+			
+			// echo $momentPeriodVo
+			// 	->getEndDate()
+			// 	->format('Y-m-d'); // 2013-10-27
+			
+			// echo $momentPeriodVo
+			// 	->getRefDate()
+			// 	->format('Y-m-d'); // 2013-10-23
+			
+			// echo $momentPeriodVo->getInterval(); // 43 = week of year
+
 		});
 	});
 });

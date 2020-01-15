@@ -32,7 +32,7 @@ final class MyMiddleware
         $shouldProcess = false;
 
         foreach ($this->allowedPaths as $allowedPath) {
-            if (strpos($path, $this->allowedPath) === 0) {
+            if (strpos($path, $allowedPath) === 0) {
                 $shouldProcess = true;
                 break;
             }

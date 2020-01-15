@@ -1,4 +1,7 @@
 {
+    "fightbulc/moment": {
+        "version": "1.30.0"
+    },
     "markbaker/complex": {
         "version": "1.4.7"
     },

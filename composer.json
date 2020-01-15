@@ -13,6 +13,7 @@
     ],
     "require": {
         "php": "^7.2.0",
+        "fightbulc/moment": "^1.30",
         "monolog/monolog": "^1.22",
         "phpoffice/phpspreadsheet": "^1.10",
         "slim/php-view": "^2.0",
