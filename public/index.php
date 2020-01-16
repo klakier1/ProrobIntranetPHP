@@ -62,7 +62,21 @@ $app->get('/test/{date}', function (Request $request, Response $response, array 
 	echo $time->endOf('week')->format('Y-m-d');
 	echo "<br>";
 	echo $time->format('W');
-	
+	echo "<br>";
+
+
+	$period = new DatePeriod(
+		new DateTime('2010-10-01'),
+		new DateInterval('P1D'),
+		new DateTime('2010-10-05')
+	);
+	echo "<br>";
+
+	//echo json_encode($period);
+	foreach ($period as $key => $value) {
+		echo "{$value->format('Y-m-d')} {$key}<br>";
+		      
+	}
 	return;
 
 	$locale = 'pl';
@@ -810,20 +824,20 @@ $app->group('/generate', function (\Slim\App $app) {
 
 			// $m = new \Moment\Moment('2013-10-23T10:00:00');
 			// $momentPeriodVo = $m->getPeriod('week');
-			
+
 			// // results comes as well as a value object class
 			// echo $momentPeriodVo
 			// 	->getStartDate()
 			// 	->format('Y-m-d'); // 2013-10-21
-			
+
 			// echo $momentPeriodVo
 			// 	->getEndDate()
 			// 	->format('Y-m-d'); // 2013-10-27
-			
+
 			// echo $momentPeriodVo
 			// 	->getRefDate()
 			// 	->format('Y-m-d'); // 2013-10-23
-			
+
 			// echo $momentPeriodVo->getInterval(); // 43 = week of year
 
 		});
