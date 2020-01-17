@@ -75,7 +75,6 @@ $app->get('/test/{date}', function (Request $request, Response $response, array 
 	//echo json_encode($period);
 	foreach ($period as $key => $value) {
 		echo "{$value->format('Y-m-d')} {$key}<br>";
-		      
 	}
 	return;
 
@@ -781,15 +780,37 @@ $app->group('/generate', function (\Slim\App $app) {
 				$result = $db->getTimesheetByUser($args['id'], $timesheetData, $period['start'], $period['end']);
 				if ($result != GET_TIMESHEET_SUCCESS)
 					throw new Exception("Failed loading timesheet data for XLS");
-				//echo json_encode($timesheetData);
+
 				//fetch user
 				$result = $db->getUserShort($args['id'], $userData);
 				if ($result != GET_USERS_SUCCESS)
 					throw new Exception("Failed loading user data for XLS");
 				$user = $userData['data'][0];
-				//echo "<br><br><br><br>";
-				//echo json_encode($userData);
 
+				//create array of dates as keys
+				$realEnd = clone $period['end'];
+				$realEnd->modify('+1 day');
+
+				$range = new DatePeriod(
+					$period['start'],
+					new DateInterval('P1D'),
+					$realEnd
+				);
+				$dataForXls = array();
+				foreach ($range as $key => $value) {
+					$dataForXls[$value->format('Y-m-d')] = array();
+				}
+				//infalte array of dates as keys, with timesheet data
+				foreach ($timesheetData['data'] as $timesheetRow) {
+					$cdate = $timesheetRow['date'];
+					if (isset($dataForXls[$cdate])) {
+						$dataForXls[$cdate][] = $timesheetRow;
+					} else {
+						throw new Exception();
+					}
+				}
+
+				//set locale
 				$locale = 'pl';
 				$validLocale = \PhpOffice\PhpSpreadsheet\Settings::setLocale($locale);
 				if (!$validLocale) {
@@ -806,7 +827,37 @@ $app->group('/generate', function (\Slim\App $app) {
 				$worksheet->getCell('E9')->setValue($period['end']->format('Y-m-d'));
 				//$worksheet->setCellValue('C7', '=NUM.TYG(C9;2)');
 
+				//insert data to xls
+				$row = 13;
+				foreach ($dataForXls as $key => $day) {
+					if (count($day) == 0) {
+						//if there is now timesheetrow just put date
+						$excelDateValue = \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(new DateTime($key));
+						$worksheet->setCellValueByColumnAndRow(2, $row, $excelDateValue);
+						$worksheet->getStyleByColumnAndRow(2, $row, 'dd-mm-yyyy');
+						$row++;
+					} else {
+						foreach ($day as $workDay) {
+							$excelDateValue = \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(new DateTime($workDay['date']));
+							$excelTimeFromValue = timeToExcelFormat(new DateTime($workDay['from']));
+							$excelTimeToValue = timeToExcelFormat(new DateTime($workDay['to']));
+							$excelTimeBreakValue = timeToExcelFormat(new DateTime($workDay['customer_break'])) + timeToExcelFormat(new DateTime($workDay['statutory_break']));
 
+							$worksheet->setCellValueByColumnAndRow(2, $row, $excelDateValue);
+							$worksheet->setCellValueByColumnAndRow(3, $row, $excelTimeFromValue);
+							$worksheet->setCellValueByColumnAndRow(4, $row, $excelTimeToValue);
+							$worksheet->setCellValueByColumnAndRow(5, $row, $excelTimeBreakValue);
+
+							$worksheet->getStyleByColumnAndRow(2, $row)->getNumberFormat()->setFormatCode('dd-mm-yyyy');
+							$worksheet->getStyleByColumnAndRow(3, $row)->getNumberFormat()->setFormatCode('hh:mm');
+							$worksheet->getStyleByColumnAndRow(4, $row)->getNumberFormat()->setFormatCode('hh:mm');
+							$worksheet->getStyleByColumnAndRow(5, $row)->getNumberFormat()->setFormatCode('hh:mm');
+
+							$row++;
+						}
+					}
+				}
+				
 				$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xls($spreadsheet);
 				$tempFile = tempnam(File::sysGetTempDir(), 'phpxltmp');
 				$tempFile = $tempFile ?: __DIR__ . '/temp.xls';
@@ -911,6 +962,11 @@ function parseTaggedYaml($in)
 		$in = YamlUtils::taggedValueToArray($in);
 	}
 	return $in;
+}
+
+function timeToExcelFormat(DateTime $time): float
+{
+	return (($time->format('H') * 3600) + ($time->format('i') * 60) + $time->format('s')) / 86400;
 }
 
 $app->run();
