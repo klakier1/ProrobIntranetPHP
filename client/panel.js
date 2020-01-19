@@ -159,6 +159,7 @@ function getPeriodOfTime(range) {
             break;
         case "period":
             range.start = $('#inputPeriodFrom').val();
+            range.end = $('#inputPeriodTo').val();
         default:
             break;
     }

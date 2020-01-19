@@ -820,12 +820,19 @@ $app->group('/generate', function (\Slim\App $app) {
 				$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
 				$spreadsheet = $reader->load('../client/templates/template_week.xls');
 				$worksheet = $spreadsheet->getActiveSheet();
+
+				$spreadsheet->getActiveSheet()->getPageSetup()
+					->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
+				$spreadsheet->getActiveSheet()->getPageSetup()
+					->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4);
+
 				$worksheet->getCell('C3')->setValue($user['first_name']);
 				$worksheet->getCell('C5')->setValue($user['last_name']);
 				$worksheet->getCell('C7')->setValue($period['start']->format('W'));
 				$worksheet->getCell('C9')->setValue($period['start']->format('Y-m-d'));
 				$worksheet->getCell('E9')->setValue($period['end']->format('Y-m-d'));
 				//$worksheet->setCellValue('C7', '=NUM.TYG(C9;2)');
+				
 
 				//insert data to xls
 				$row = 13;
@@ -834,9 +841,10 @@ $app->group('/generate', function (\Slim\App $app) {
 						//if there is now timesheetrow just put date
 						$excelDateValue = \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(new DateTime($key));
 						$worksheet->setCellValueByColumnAndRow(2, $row, $excelDateValue);
-						$worksheet->getStyleByColumnAndRow(2, $row, 'dd-mm-yyyy');
+						$worksheet->getStyleByColumnAndRow(2, $row)->getNumberFormat()->setFormatCode('dd-mm-yyyy');
 						$row++;
 					} else {
+						$moreThenOneTsrPerDay = false;
 						foreach ($day as $workDay) {
 							$excelDateValue = \PhpOffice\PhpSpreadsheet\Shared\Date::PHPToExcel(new DateTime($workDay['date']));
 							$excelTimeFromValue = timeToExcelFormat(new DateTime($workDay['from']));
@@ -854,17 +862,29 @@ $app->group('/generate', function (\Slim\App $app) {
 							$worksheet->getStyleByColumnAndRow(5, $row)->getNumberFormat()->setFormatCode('hh:mm');
 
 							$row++;
+							if($moreThenOneTsrPerDay){
+								$worksheet->insertNewRowBefore($row);
+							}
+							$moreThenOneTsrPerDay = true;
+							
+							
 						}
 					}
 				}
-				
+
+				//$writer = new \PhpOffice\PhpSpreadsheet\Writer\Pdf\Tcpdf($spreadsheet);
 				$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xls($spreadsheet);
+
 				$tempFile = tempnam(File::sysGetTempDir(), 'phpxltmp');
 				$tempFile = $tempFile ?: __DIR__ . '/temp.xls';
 				$writer->save($tempFile);
 
 				$response = $response->withHeader('Content-Type', 'application/vnd.ms-excel');
-				$response = $response->withHeader('Content-Disposition', 'attachment; filename="file.xls"');
+				//$response = $response->withHeader('Content-Type', 'application/pdf');
+				$response = $response->withHeader(
+					'Content-Disposition', 
+					"attachment; filename=\"{$user['first_name']} {$user['last_name']} Godziny CW{$period['start']->format('W')}.xls\""
+				);
 
 				$stream = fopen($tempFile, 'r+');
 

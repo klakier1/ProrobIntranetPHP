@@ -40,8 +40,8 @@
 
         function getDbCredentials(){
 
-            //$database_url = getenv("DATABASE_URL_PROROB");
-            $database_url = getenv("DATABASE_URL_LOCAL");
+            $database_url = getenv("DATABASE_URL_PROROB");
+            //$database_url = getenv("DATABASE_URL_LOCAL");
             return parse_url($database_url);
         }
     }
